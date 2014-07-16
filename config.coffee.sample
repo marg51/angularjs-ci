@@ -1,0 +1,2 @@
+exports = 
+	Authorization: "echo '{{token}}:' | base64"
