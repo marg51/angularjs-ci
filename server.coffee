@@ -144,6 +144,7 @@ updateStatusDeployment = (params, fn) ->
     headers:
       Authorization: 'basic '+config.Authorization
       "User-Agent": "angularjs-ci"
+      "Accept": "application/vnd.github.cannonball-preview+json"
   , fn )
 
   req.write(JSON.stringify({  "state": params.state, "description": params.message || "no infos"}));
