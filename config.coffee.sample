@@ -1,2 +1,2 @@
-exports = 
+exports.config = 
 	Authorization: "echo '{{token}}:' | base64"

@@ -1,18 +1,19 @@
 githubhook = require('githubhook')
 request = require('https').request
 spawn = require('child_process').spawn
-config = require('./config')
+config = require('./config').config
 
 github = githubhook(logger:console)
 
-github.listen()
+# github.listen()
 
 repo = "marg51/git"
 host_build = "http://git.uto.io"
 
 
 # any push made to the repo
-github.on 'push', (op,ref,data) ->
+# github.on 'push', (op,ref,data) ->
+test = (op,ref,data) ->
   # we set the status as pending while we make tests
 
   req = updateStatus 'pending', data.after, (res) ->
@@ -24,6 +25,7 @@ github.on 'push', (op,ref,data) ->
     res.on 'end', ->
       # result of the query
       result = JSON.parse(updateStatusData.toString())
+      console.log result
       
       # if there is an id, so the update is successful (I guess, actually)
       if result.id?
@@ -71,5 +73,7 @@ updateStatus = (status, sha, fn) ->
   
   # don't forget to call req.end()
   return req
+
+test(null, "refs/heads/dev3",{after:"e5cdc91902e0399908d7fa4ff84ff1820da4ac24"})
 
 
