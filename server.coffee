@@ -84,7 +84,7 @@ updateStatus = (params, fn) ->
       "User-Agent": "angularjs-ci"
   , fn )
 
-  req.write(JSON.stringify({  "state": params.state,  "target_url": host_build+"/build/"+params.sha+'.html',  "description": params.message || "no infos",  "context": "continuous-integration/angularjs-ci"}));
+  req.write(JSON.stringify({  "state": params.status,  "target_url": host_build+"/build/"+params.sha+'.html',  "description": params.message || "no infos",  "context": "continuous-integration/angularjs-ci"}));
   
   req.on 'error', ->
     console.error 'err', arguments
@@ -122,7 +122,7 @@ updateStatusDeployment = (params, fn) ->
       "User-Agent": "angularjs-ci"
   , fn )
 
-  req.write(JSON.stringify({  "state": params.status, "description": params.message || "no infos"}));
+  req.write(JSON.stringify({  "state": params.state, "description": params.message || "no infos"}));
   
   req.on 'error', ->
     console.error 'err', arguments
