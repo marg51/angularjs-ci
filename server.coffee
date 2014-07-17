@@ -77,17 +77,16 @@ github.on 'status', (repo, refs, data)->
             data2 = JSON.parse(data2)
             console.log "pending", data2
 
-        setTimeout( ->
-          updateStatusDeployment {state: 'success', id: data.id, message: 'App ready to use'}, (res2) ->
-            data2 = ''
-            res2.on 'data', (chunk) ->
-              data2+=chunk
+      
+            updateStatusDeployment {state: 'success', id: data.id, message: 'App ready to use'}, (res2) ->
+              data2 = ''
+              res2.on 'data', (chunk) ->
+                data2+=chunk
 
-            res2.on 'end', ->
-              data2 = JSON.parse(data2)
-              console.log "setTimeout", data2
+              res2.on 'end', ->
+                data2 = JSON.parse(data2)
+                console.log "setTimeout", data2
               
-        , 1000)
         req2.end()
     req.end()
 
