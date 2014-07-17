@@ -2,6 +2,7 @@
 
 cd ../karma && git fetch && git checkout origin/$1
 
+echo "<pre>" > ../git/build/$2.html
 karma start karma.conf.js > ../git/build/$2.html
 result=$?
 
