@@ -10,13 +10,19 @@ github.listen()
 repo = "marg51/git"
 host_build = "http://git.uto.io"
 
+tests = undefined
 
 # any push made to the repo
 github.on 'push', (op,ref,data) ->
 # test = (op,ref,data) ->
-  # we set the status as pending while we make tests
 
-  req = updateStatus 'pending', data.after, (res) ->
+  # for now, we don't run multiple process
+  if tests?
+    updateStatus {status: 'error', sha: data.after, message: 'can\'t run tests, already a process'}
+    return
+
+  # we set the status as pending while we make tests
+  req = updateStatus {status: 'pending', sha: data.after, message: 'tests are running'}, (res) ->
     updateStatusData = ""
 
     res.on 'data', (chunk) ->
@@ -34,11 +40,12 @@ github.on 'push', (op,ref,data) ->
 
         # when the tests are done
         tests.on 'close', (code) ->
+          tests = undefined
           # everything went fine
           if code is 0
-            update = updateStatus 'success', data.after
+            update = updateStatus {status: 'success', sha: data.after}
           else
-            update = updateStatus 'failure', data.after
+            update = updateStatus {status: 'failure', sha: data.after, message: "tests failed"}
 
           # throw the query
           update.end()
@@ -54,7 +61,7 @@ github.on 'push', (op,ref,data) ->
 
 console.log('go')
 
-updateStatus = (status, sha, fn) ->
+updateStatus = (params, fn) ->
   console.log('update',sha,status)
 
   req = request(
@@ -66,7 +73,7 @@ updateStatus = (status, sha, fn) ->
       "User-Agent": "angularjs-ci"
   , fn )
 
-  req.write(JSON.stringify({  "state": status,  "target_url": host_build+"/build/"+sha+'.html',  "description": "no infos",  "context": "continuous-integration/angularjs-ci"}));
+  req.write(JSON.stringify({  "state": params.status,  "target_url": host_build+"/build/"+params.sha+'.html',  "description": params.message || "no infos",  "context": "continuous-integration/angularjs-ci"}));
   
   req.on 'error', ->
     console.error 'err', arguments

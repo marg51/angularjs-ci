@@ -6,7 +6,7 @@ karma start karma.conf.js
 result=$?
 
 
-sleep 0.4
-cp /tmp/html-report.html > ../git/build/$2.html
+# sleep 0.4
+mv /tmp/html-report.html ../git/build/$2.html
 
 exit $result
