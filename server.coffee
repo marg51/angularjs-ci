@@ -27,10 +27,10 @@ github.on 'push', (op,ref,data) ->
       
       # if there is an id, so the update is successful (I guess, actually)
       if result.id?
-        # run anything, karma, whatever. The sha of the new commit is passed
-        tests = spawn('post-update.sh',[data.after])
+        # run anything, karma, whatever. The branch and the sha of the new commit is passed
+        tests = spawn('post-update.sh',[ref.split('/').pop(),data.after])
 
-        # we the tests are done
+        # when the tests are done
         tests.on 'close', (code) ->
           # everything went fine
           if code is 0
@@ -54,7 +54,7 @@ console.log('go')
 
 updateStatus = (status, sha, fn) ->
   console.log('update',sha,status)
-  
+
   req = request(
     hostname:'api.github.com'
     method: 'POST'
@@ -64,7 +64,7 @@ updateStatus = (status, sha, fn) ->
       "User-Agent": "angularjs-ci"
   , fn )
 
-  req.write(JSON.stringify({  "state": status,  "target_url": build_host+"/build/"+sha+'.txt',  "description": "no infos right now",  "context": "continuous-integration/mopp"}));
+  req.write(JSON.stringify({  "state": status,  "target_url": build_host+"/build/"+sha+'.html',  "description": "no infos right now",  "context": "continuous-integration/mopp"}));
   
   req.on 'error', ->
     console.error 'err', arguments
