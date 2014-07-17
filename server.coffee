@@ -5,15 +5,15 @@ config = require('./config').config
 
 github = githubhook(logger:console)
 
-# github.listen()
+github.listen()
 
 repo = "marg51/git"
 host_build = "http://git.uto.io"
 
 
 # any push made to the repo
-# github.on 'push', (op,ref,data) ->
-test = (op,ref,data) ->
+github.on 'push', (op,ref,data) ->
+# test = (op,ref,data) ->
   # we set the status as pending while we make tests
 
   req = updateStatus 'pending', data.after, (res) ->
@@ -74,6 +74,6 @@ updateStatus = (status, sha, fn) ->
   # don't forget to call req.end()
   return req
 
-test(null, "refs/heads/dev3",{after:"e5cdc91902e0399908d7fa4ff84ff1820da4ac24"})
+# test(null, "refs/heads/dev3",{after:"e5cdc91902e0399908d7fa4ff84ff1820da4ac24"})
 
 
