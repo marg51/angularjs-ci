@@ -22,7 +22,7 @@ github.on 'push', (op,ref,data) ->
     return
 
   # we set the status as pending while we make tests
-  req = updateStatus {status: 'pending', sha: data.after, message: 'tests are running'}, (res) ->
+  req = updateStatus {status: 'pending', sha: data.after, message: 'Wait for the tests'}, (res) ->
     updateStatusData = ""
 
     res.on 'data', (chunk) ->
