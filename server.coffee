@@ -58,13 +58,13 @@ github.on 'push', (op,ref,data) ->
   req.end()
 
 github.on 'status', (repo, refs, data)->
-  if data.status is "success" and data.branches[0].name is 'dev'
+  if data.state is "success" and data.branches[0].name is 'dev'
     req = addDeployment 'dev', (res) ->
       res.on 'end', (data) ->
         data = JSON.parse(data)
-        req2 = updateStatusDeployment {status: 'pending', id: data.id}
+        req2 = updateStatusDeployment {state: 'pending', id: data.id}
         setTimeout( ->
-          updateStatusDeployment {status: 'success', id: data.id, message: 'App ready to use'}
+          updateStatusDeployment {state: 'success', id: data.id, message: 'App ready to use'}
         , 1000)
         req2.end()
     req.end()
@@ -84,7 +84,7 @@ updateStatus = (params, fn) ->
       "User-Agent": "angularjs-ci"
   , fn )
 
-  req.write(JSON.stringify({  "state": params.status,  "target_url": host_build+"/build/"+params.sha+'.html',  "description": params.message || "no infos",  "context": "continuous-integration/angularjs-ci"}));
+  req.write(JSON.stringify({  "state": params.state,  "target_url": host_build+"/build/"+params.sha+'.html',  "description": params.message || "no infos",  "context": "continuous-integration/angularjs-ci"}));
   
   req.on 'error', ->
     console.error 'err', arguments
