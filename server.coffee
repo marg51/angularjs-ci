@@ -31,7 +31,6 @@ github.on 'push', (op,ref,data) ->
     res.on 'end', ->
       # result of the query
       result = JSON.parse(updateStatusData.toString())
-      console.log result
       
       # if there is an id, so the update is successful (I guess, actually)
       if result.id?
@@ -58,11 +57,12 @@ github.on 'push', (op,ref,data) ->
 
   req.end()
 
+github.on 'status', ->
+  console.log arguments
 
-console.log('go')
 
 updateStatus = (params, fn) ->
-  console.log('update',params)
+  # console.log('update',params)
 
   req = request(
     hostname:'api.github.com'
