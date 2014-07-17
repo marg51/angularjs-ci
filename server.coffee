@@ -1,7 +1,7 @@
 githubhook = require('githubhook')
 request = require('https').request
 spawn = require('child_process').spawn
-config = require('config')
+config = require('./config')
 
 github = githubhook(logger:console)
 
@@ -64,7 +64,7 @@ updateStatus = (status, sha, fn) ->
       "User-Agent": "angularjs-ci"
   , fn )
 
-  req.write(JSON.stringify({  "state": status,  "target_url": build_host+"/build/"+sha+'.html',  "description": "no infos right now",  "context": "continuous-integration/mopp"}));
+  req.write(JSON.stringify({  "state": status,  "target_url": host_build+"/build/"+sha+'.html',  "description": "no infos",  "context": "continuous-integration/angularjs-ci"}));
   
   req.on 'error', ->
     console.error 'err', arguments
