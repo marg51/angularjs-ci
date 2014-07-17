@@ -35,7 +35,7 @@ github.on 'push', (op,ref,data) ->
       # if there is an id, so the update is successful (I guess, actually)
       if result.id?
         # run anything, karma, whatever. The branch and the sha of the new commit is passed
-        tests = spawn('./post-update.sh',[ref.split('/').pop(),data.after])
+        tests = spawn('./post-update.sh',[ref.split('/').pop(),data.after.slice(0,7)])
 
         # when the tests are done
         tests.on 'close', (code) ->
@@ -110,7 +110,7 @@ updateStatus = (params, fn) ->
       "Accept": "application/vnd.github.cannonball-preview+json"
   , fn )
 
-  req.write(JSON.stringify({  "state": params.status,  "target_url": host_build+"/build/"+params.sha+'.html',  "description": params.message || "no infos",  "context": "continuous-integration/angularjs-ci"}));
+  req.write(JSON.stringify({  "state": params.status,  "target_url": host_build+"/build/"+params.sha.slice(0,7)+'.html',  "description": params.message || "no infos",  "context": "continuous-integration/angularjs-ci"}));
   
   req.on 'error', ->
     console.error 'err', arguments
