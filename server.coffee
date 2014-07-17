@@ -88,6 +88,7 @@ updateStatus = (params, fn) ->
     headers:
       Authorization: 'basic '+config.Authorization
       "User-Agent": "angularjs-ci"
+      "Accept": "application/vnd.github.cannonball-preview+json"
   , fn )
 
   req.write(JSON.stringify({  "state": params.status,  "target_url": host_build+"/build/"+params.sha+'.html',  "description": params.message || "no infos",  "context": "continuous-integration/angularjs-ci"}));
@@ -109,6 +110,7 @@ addDeployment = (ref, fn) ->
     headers:
       Authorization: 'basic '+config.Authorization
       "User-Agent": "angularjs-ci"
+      "Accept": "application/vnd.github.cannonball-preview+json"
   , fn )
 
   req.write(JSON.stringify({ ref:ref, auto_merge:false, environment:"staging", description: "Ready to deploy #{ref}", required_contexts:["continuous-integration/angularjs-ci"]} ) )
