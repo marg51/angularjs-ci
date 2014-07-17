@@ -74,8 +74,8 @@ github.on 'status', (repo, refs, data)->
             data2+=chunk
 
           res2.on 'end', ->
-            data2 = "pending", JSON.parse(data2)
-            console.log data2
+            data2 = JSON.parse(data2)
+            console.log "pending", data2
 
         setTimeout( ->
           updateStatusDeployment {state: 'success', id: data.id, message: 'App ready to use'}, (res2) ->
