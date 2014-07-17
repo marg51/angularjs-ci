@@ -74,7 +74,7 @@ github.on 'status', (repo, refs, data)->
             data2+=chunk
 
           res2.on 'end', ->
-            data2 = JSON.parse(data2)
+            data2 = "pending", JSON.parse(data2)
             console.log data2
 
         setTimeout( ->
@@ -85,7 +85,7 @@ github.on 'status', (repo, refs, data)->
 
             res2.on 'end', ->
               data2 = JSON.parse(data2)
-              console.log data2
+              console.log "setTimeout", data2
               
         , 1000)
         req2.end()
