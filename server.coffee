@@ -60,8 +60,14 @@ github.on 'push', (op,ref,data) ->
 github.on 'status', (repo, refs, data)->
   if data.state is "success" and data.branches[0].name is 'dev'
     req = addDeployment 'dev', (res) ->
-      res.on 'end', (data) ->
+      data = ''
+      res.on 'data', (chunk) ->
+        data+=chunk
+
+      res.on 'end', ->
         data = JSON.parse(data)
+        console.log data
+
         req2 = updateStatusDeployment {state: 'pending', id: data.id}
         setTimeout( ->
           updateStatusDeployment {state: 'success', id: data.id, message: 'App ready to use'}
@@ -94,7 +100,7 @@ updateStatus = (params, fn) ->
 
 
 addDeployment = (ref, fn) ->
-  # console.log('update',params)
+  console.log('addDeployment',ref)
 
   req = request(
     hostname:'api.github.com'
@@ -111,7 +117,7 @@ addDeployment = (ref, fn) ->
     console.error 'err', arguments
 
 updateStatusDeployment = (params, fn) ->
-  # console.log('update',params)
+  console.log('updateStatusDeployment',params)
 
   req = request(
     hostname:'api.github.com'
