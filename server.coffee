@@ -57,8 +57,19 @@ github.on 'push', (op,ref,data) ->
 
   req.end()
 
-github.on 'status', ->
-  console.log arguments
+github.on 'status', (repo, refs, data)->
+  if data.status is "success" and data.branches[0].name is 'dev'
+    req = addDeployment 'dev', (res) ->
+      res.on 'end', (data) ->
+        data = JSON.parse(data)
+        req2 = updateStatusDeployment {status: 'pending', id: data.id}
+        setTimeout( ->
+          updateStatusDeployment {status: 'success', id: data.id, message: 'App ready to use'}
+        , 1000)
+        req2.end()
+    req.end()
+
+
 
 
 updateStatus = (params, fn) ->
@@ -81,6 +92,43 @@ updateStatus = (params, fn) ->
   # don't forget to call req.end()
   return req
 
+
+addDeployment = (ref, fn) ->
+  # console.log('update',params)
+
+  req = request(
+    hostname:'api.github.com'
+    method: 'POST'
+    path: '/repos/'+repo+'/deployments'
+    headers:
+      Authorization: 'basic '+config.Authorization
+      "User-Agent": "angularjs-ci"
+  , fn )
+
+  req.write(JSON.stringify({ ref:ref, auto_merge:false, environment:"staging", description: "Ready to deploy #{ref}", required_contexts:["continuous-integration/angularjs-ci"]} ) )
+  
+  req.on 'error', ->
+    console.error 'err', arguments
+
+updateStatusDeployment = (params, fn) ->
+  # console.log('update',params)
+
+  req = request(
+    hostname:'api.github.com'
+    method: 'POST'
+    path: '/repos/'+repo+'/deployments/'+params.id+'/statuses'
+    headers:
+      Authorization: 'basic '+config.Authorization
+      "User-Agent": "angularjs-ci"
+  , fn )
+
+  req.write(JSON.stringify({  "state": params.status, "description": params.message || "no infos"}));
+  
+  req.on 'error', ->
+    console.error 'err', arguments
+  
+  # don't forget to call req.end()
+  return req
 # test(null, "refs/heads/dev3",{after:"e5cdc91902e0399908d7fa4ff84ff1820da4ac24"})
 
 
