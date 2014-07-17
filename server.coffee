@@ -62,12 +62,12 @@ github.on 'push', (op,ref,data) ->
 console.log('go')
 
 updateStatus = (params, fn) ->
-  console.log('update',sha,status)
+  console.log('update',params)
 
   req = request(
     hostname:'api.github.com'
     method: 'POST'
-    path: '/repos/'+repo+'/commits/'+sha+'/statuses'
+    path: '/repos/'+repo+'/commits/'+params.sha+'/statuses'
     headers:
       Authorization: 'basic '+config.Authorization
       "User-Agent": "angularjs-ci"
