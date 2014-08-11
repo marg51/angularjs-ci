@@ -7,8 +7,8 @@ github = githubhook(logger:console)
 
 github.listen()
 
-repo = "marg51/git"
-host_build = "http://git.uto.io"
+repo = "wearemop/customer-service"
+host_build = "http://integration.mopp.com/build/cs"
 
 tests = undefined
 
@@ -41,6 +41,7 @@ github.on 'push', (op,ref,data) ->
         tests.on 'close', (code) ->
           tests = undefined
           # everything went fine
+          console.log code
           if code is 0
             update = updateStatus {status: 'success', sha: data.after}
           else
@@ -49,6 +50,8 @@ github.on 'push', (op,ref,data) ->
           # throw the query
           update.end()
 
+        tests.stdout.on 'data', (data) ->
+            console.log 'stdout data',data.toString()
         tests.on 'error', ->
           console.log 'spawn.error', arguments
 
@@ -59,14 +62,15 @@ github.on 'push', (op,ref,data) ->
 
 github.on 'status', (repo, refs, data)->
   if data.state is "success" and ( data.branches[0].name is 'dev' or data.branches[0].name is 'master' )
-    req = addDeployment data.branches[0].name, (res) ->
+    branch = data.branches[0].name
+    req = addDeployment branch, (res) ->
       data = ''
       res.on 'data', (chunk) ->
         data+=chunk
 
       res.on 'end', ->
         data = JSON.parse(data)
-        console.log data
+        console.log 'status success on branch',data
 
         req2 = updateStatusDeployment {state: 'pending', id: data.id}, (res2) ->
           data2 = ''
@@ -77,19 +81,24 @@ github.on 'status', (repo, refs, data)->
             data2 = JSON.parse(data2)
             console.log "pending", data2
 
-      
-            setTimeout( ->
-              req3 = updateStatusDeployment {state: 'success', id: data.id, message: 'App ready to use'}, (res2) ->
-                data2 = ''
-                res2.on 'data', (chunk) ->
-                  data2+=chunk
+            deploy = spawn("./deployment.sh",[branch])
+            deploy.stdout.on 'data', (c) -> console.log 'deployment', c.toString()
+            deploy.on 'close', (code) ->
+              console.log 'deploy code',code
+              if code is 0
+                req3 = updateStatusDeployment {state: 'success', id: data.id, message: 'App ready to use'}, (res2) ->
+                  data2 = ''
+                  res2.on 'data', (chunk) ->
+                    data2+=chunk
 
-                res2.on 'end', ->
-                  data2 = JSON.parse(data2)
-                  console.log "setTimeout", data2
-
+                  res2.on 'end', ->
+                    data2 = JSON.parse(data2)
+                    console.log "deploy", data2
+              else
+                req3 = updateStatusDeployment {status: 'error', id: data.id, message: 'Cannot build or deploy'}, (res2) ->
               req3.end()
-            , 1000)
+              
+
               
         req2.end()
     req.end()
@@ -110,7 +119,7 @@ updateStatus = (params, fn) ->
       "Accept": "application/vnd.github.cannonball-preview+json"
   , fn )
 
-  req.write(JSON.stringify({  "state": params.status,  "target_url": host_build+"/build/"+params.sha.slice(0,10)+'.html',  "description": params.message || "no infos",  "context": "continuous-integration/angularjs-ci"}));
+  req.write(JSON.stringify({  "state": params.status,  "target_url": host_build+"/"+params.sha.slice(0,10)+'.html',  "description": params.message || "no infos",  "context": "continuous-integration/angularjs-ci"}));
   
   req.on 'error', ->
     console.error 'err', arguments
