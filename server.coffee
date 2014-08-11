@@ -58,7 +58,7 @@ github.on 'push', (op,ref,data) ->
   req.end()
 
 github.on 'status', (repo, refs, data)->
-  if data.state is "success" and ( data.branches[0].name is 'dev' or data.branches[0].name is 'master'
+  if data.state is "success" and ( data.branches[0].name is 'dev' or data.branches[0].name is 'master' )
     req = addDeployment data.branches[0].name, (res) ->
       data = ''
       res.on 'data', (chunk) ->
