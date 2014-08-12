@@ -113,7 +113,7 @@ github.on 'status', (repo, refs, data)->
 
 updateStatus = (params, fn) ->
   status = if params.status is 'success' then 'success'.green else if params.status is 'pending' then 'pending'.red else 'error'.magenta
-  console.log " * status",(status+"").green+"(#".blue+(params.sha.slice(0,7)+"").cyan+")".blue
+  console.log " * status",(status+"").green+"(#".blue+(params.sha.slice(0,10)+"").cyan+")".blue
 
   req = request(
     hostname:'api.github.com'
