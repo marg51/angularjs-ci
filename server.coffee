@@ -87,7 +87,7 @@ github.on 'status', (repo, refs, data)->
             debug "pending", data2
 
             deploy = spawn("./deployment.sh",[branch])
-            deploy.stdout.on 'data', (c) -> console.log 'deployment', c.toString()
+            deploy.stdout.on 'data', (c) -> debug 'deployment', c.toString()
             deploy.on 'close', (code) ->
               debug 'deploy code',code
               if code is 0
@@ -135,8 +135,6 @@ updateStatus = (params, fn) ->
 
 
 addDeployment = (params, fn) ->
-  console.log " * deploy",(params.ref+"").yellow+"(#".blue+(params.env+"").cyan+")".blue
-
   req = request(
     hostname:'api.github.com'
     method: 'POST'
@@ -153,7 +151,8 @@ addDeployment = (params, fn) ->
     debug 'err', arguments
 
 updateStatusDeployment = (params, fn) ->
-  console.log " * deployed",(params.ref+"").green+"(#".blue+(params.env+"").cyan+")".blue
+  status = if params.state is 'success' then 'success'.green else if params.status is 'pending' then 'pending'.red else 'error'.magenta
+  console.log " * deploy","->".grey,(params.env+"").underline,status+"(#".blue+(params.ref+"").cyan+")".blue
 
   req = request(
     hostname:'api.github.com'
