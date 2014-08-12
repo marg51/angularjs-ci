@@ -2,6 +2,7 @@ githubhook = require('githubhook')
 request = require('https').request
 spawn = require('child_process').spawn
 config = require('./config').config
+colors = require('colors')
 
 github = githubhook(logger:console)
 
