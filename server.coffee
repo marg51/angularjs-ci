@@ -113,7 +113,7 @@ github.on 'status', (repo, refs, data)->
 
 updateStatus = (params, fn) ->
   status = if params.status is 'success' then 'success'.green else if params.status is 'pending' then 'pending'.red else 'error'.magenta
-  console.log " * status",(status+"").green+"(#".blue+(params.sha+"").cyan+")".blue," ->".grey,(host_build+"/"+params.sha.slice(0,10)+".html").cyan
+  console.log " * status",(status+"").green+"(#".blue+(params.sha.slice(0,7)+"").cyan+")".blue," ->".grey,(host_build+"/"+params.sha.slice(0,10)+".html").cyan
 
   req = request(
     hostname:'api.github.com'
@@ -147,7 +147,7 @@ addDeployment = (params, fn) ->
       "Accept": "application/vnd.github.cannonball-preview+json"
   , fn )
 
-  req.write(JSON.stringify({ ref:ref, auto_merge:false, environment:params.env, description: "Ready to deploy #{params.ref}", required_contexts:["continuous-integration/angularjs-ci"]} ) )
+  req.write(JSON.stringify({ ref:params.ref, auto_merge:false, environment:params.env, description: "Ready to deploy #{params.ref}", required_contexts:["continuous-integration/angularjs-ci"]} ) )
   
   req.on 'error', ->
     debug 'err', arguments
