@@ -113,7 +113,7 @@ github.on 'status', (repo, refs, data)->
 
 updateStatus = (params, fn) ->
   status = if params.status is 'success' then 'success'.green else if params.status is 'pending' then 'pending'.red else 'error'.magenta
-  console.log " * status",(status+"").green+"(#".blue+(params.sha.slice(0,7)+"").cyan+")".blue," ->".grey,(host_build+"/"+params.sha.slice(0,10)+".html").cyan
+  console.log " * status",(status+"").green+"(#".blue+(params.sha.slice(0,7)+"").cyan+")".blue
 
   req = request(
     hostname:'api.github.com'
@@ -173,4 +173,8 @@ updateStatusDeployment = (params, fn) ->
   return req
 # test(null, "refs/heads/dev3",{after:"e5cdc91902e0399908d7fa4ff84ff1820da4ac24"})
 
+
+console.log " *".green,"Listen to","3420".green
+console.log " *".grey,"repo ->",repo.cyan
+console.log " *".grey,"test results ->",(host_build+"/*.html").cyan
 
