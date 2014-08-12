@@ -100,7 +100,7 @@ github.on 'status', (repo, refs, data)->
                     data2 = JSON.parse(data2)
                     debug "deploy", data2
               else
-                req3 = updateStatusDeployment {status: 'error', id: data.id, message: 'Cannot build or deploy',ref: branch, env:current_env}, (res2) ->
+                req3 = updateStatusDeployment {state: 'error', id: data.id, message: 'Cannot build or deploy',ref: branch, env:current_env}, (res2) ->
               req3.end()
               
 
@@ -151,7 +151,7 @@ addDeployment = (params, fn) ->
     debug 'err', arguments
 
 updateStatusDeployment = (params, fn) ->
-  status = if params.state is 'success' then 'success'.green else if params.status is 'pending' then 'pending'.red else 'error'.magenta
+  status = if params.state is 'success' then 'success'.green else if params.status is 'pending' then 'pending'.red else (params.state+"").magenta
   console.log " * deploy","->".grey,(params.env+"").underline,status+"(#".blue+(params.ref+"").cyan+")".blue
 
   req = request(
