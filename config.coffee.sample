@@ -1,2 +1,4 @@
 exports.config = 
 	Authorization: "echo '{{token}}:' | base64"
+	repo: "wearemop/customer-service"
+	host_build: "http://integration.mopp.com/build/cs"

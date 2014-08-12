@@ -7,8 +7,11 @@ github = githubhook(logger:console)
 
 github.listen()
 
-repo = "wearemop/customer-service"
-host_build = "http://integration.mopp.com/build/cs"
+hasDebug = false
+debug = -> if hasDebug then console.log.apply(console.log,arguments)
+
+repo = config.repo
+host_build = config.host_build
 
 tests = undefined
 
@@ -41,7 +44,6 @@ github.on 'push', (op,ref,data) ->
         tests.on 'close', (code) ->
           tests = undefined
           # everything went fine
-          console.log code
           if code is 0
             update = updateStatus {status: 'success', sha: data.after}
           else
@@ -51,12 +53,12 @@ github.on 'push', (op,ref,data) ->
           update.end()
 
         tests.stdout.on 'data', (data) ->
-            console.log 'stdout data',data.toString()
+            debug 'stdout data',data.toString()
         tests.on 'error', ->
-          console.log 'spawn.error', arguments
+          debug 'spawn.error', arguments
 
       res.on 'error', ->
-        console.log 'res.error', arguments
+        debug 'res.error', arguments
 
   req.end()
 
@@ -70,7 +72,7 @@ github.on 'status', (repo, refs, data)->
 
       res.on 'end', ->
         data = JSON.parse(data)
-        console.log 'status success on branch',data
+        debug 'status success on branch',data
 
         req2 = updateStatusDeployment {state: 'pending', id: data.id}, (res2) ->
           data2 = ''
@@ -79,12 +81,12 @@ github.on 'status', (repo, refs, data)->
 
           res2.on 'end', ->
             data2 = JSON.parse(data2)
-            console.log "pending", data2
+            debug "pending", data2
 
             deploy = spawn("./deployment.sh",[branch])
             deploy.stdout.on 'data', (c) -> console.log 'deployment', c.toString()
             deploy.on 'close', (code) ->
-              console.log 'deploy code',code
+              debug 'deploy code',code
               if code is 0
                 req3 = updateStatusDeployment {state: 'success', id: data.id, message: 'App ready to use'}, (res2) ->
                   data2 = ''
@@ -93,7 +95,7 @@ github.on 'status', (repo, refs, data)->
 
                   res2.on 'end', ->
                     data2 = JSON.parse(data2)
-                    console.log "deploy", data2
+                    debug "deploy", data2
               else
                 req3 = updateStatusDeployment {status: 'error', id: data.id, message: 'Cannot build or deploy'}, (res2) ->
               req3.end()
@@ -107,7 +109,8 @@ github.on 'status', (repo, refs, data)->
 
 
 updateStatus = (params, fn) ->
-  # console.log('update',params)
+  status = if params.status is 'success' then 'success'.green else if params.status is 'pending' then 'pending'.red else 'error'.magenta
+  console.log " * status",(status+"").green+"(#".blue+(params.sha+"").cyan+")".blue," ->".grey,(host_build+"/"+params.sha.slice(0,10)+".html").cyan
 
   req = request(
     hostname:'api.github.com'
@@ -122,14 +125,18 @@ updateStatus = (params, fn) ->
   req.write(JSON.stringify({  "state": params.status,  "target_url": host_build+"/"+params.sha.slice(0,10)+'.html',  "description": params.message || "no infos",  "context": "continuous-integration/angularjs-ci"}));
   
   req.on 'error', ->
-    console.error 'err', arguments
+    debug 'err', arguments
   
   # don't forget to call req.end()
   return req
 
 
 addDeployment = (ref, fn) ->
-  console.log('addDeployment',ref)
+  params = 
+    ref: ref
+    env: "staging"
+
+  console.log " * deploy",(params.env+"").yellow+"(#".blue+(params.ref+"").cyan+")".blue
 
   req = request(
     hostname:'api.github.com'
@@ -141,13 +148,13 @@ addDeployment = (ref, fn) ->
       "Accept": "application/vnd.github.cannonball-preview+json"
   , fn )
 
-  req.write(JSON.stringify({ ref:ref, auto_merge:false, environment:"staging", description: "Ready to deploy #{ref}", required_contexts:["continuous-integration/angularjs-ci"]} ) )
+  req.write(JSON.stringify({ ref:ref, auto_merge:false, environment:params.env, description: "Ready to deploy #{params.ref}", required_contexts:["continuous-integration/angularjs-ci"]} ) )
   
   req.on 'error', ->
-    console.error 'err', arguments
+    debug 'err', arguments
 
 updateStatusDeployment = (params, fn) ->
-  console.log('updateStatusDeployment',params)
+  console.log " * deployed",(params.env+"").green+"(#".blue+(params.ref+"").cyan+")".blue
 
   req = request(
     hostname:'api.github.com'
@@ -162,7 +169,7 @@ updateStatusDeployment = (params, fn) ->
   req.write(JSON.stringify({  "state": params.state, "description": params.message || "no infos"}));
   
   req.on 'error', ->
-    console.error 'err', arguments
+    debug 'err', arguments
   
   # don't forget to call req.end()
   return req
