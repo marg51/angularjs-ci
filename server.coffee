@@ -4,7 +4,8 @@ spawn = require('child_process').spawn
 config = require('./config').config
 colors = require('colors')
 
-github = githubhook(logger:console)
+# github = githubhook(logger:console)
+github = githubhook()
 
 github.listen()
 
@@ -66,7 +67,8 @@ github.on 'push', (op,ref,data) ->
 github.on 'status', (repo, refs, data)->
   if data.state is "success" and ( data.branches[0].name is 'dev' or data.branches[0].name is 'master' )
     branch = data.branches[0].name
-    req = addDeployment branch, (res) ->
+    current_env= 'staging'
+    req = addDeployment {ref:branch, env: current_env}, (res) ->
       data = ''
       res.on 'data', (chunk) ->
         data+=chunk
@@ -75,7 +77,7 @@ github.on 'status', (repo, refs, data)->
         data = JSON.parse(data)
         debug 'status success on branch',data
 
-        req2 = updateStatusDeployment {state: 'pending', id: data.id}, (res2) ->
+        req2 = updateStatusDeployment {state: 'pending', id: data.id,ref: branch, env:current_env}, (res2) ->
           data2 = ''
           res2.on 'data', (chunk) ->
             data2+=chunk
@@ -89,7 +91,7 @@ github.on 'status', (repo, refs, data)->
             deploy.on 'close', (code) ->
               debug 'deploy code',code
               if code is 0
-                req3 = updateStatusDeployment {state: 'success', id: data.id, message: 'App ready to use'}, (res2) ->
+                req3 = updateStatusDeployment {state: 'success', id: data.id, message: 'App ready to use',ref: branch, env:current_env}, (res2) ->
                   data2 = ''
                   res2.on 'data', (chunk) ->
                     data2+=chunk
@@ -98,7 +100,7 @@ github.on 'status', (repo, refs, data)->
                     data2 = JSON.parse(data2)
                     debug "deploy", data2
               else
-                req3 = updateStatusDeployment {status: 'error', id: data.id, message: 'Cannot build or deploy'}, (res2) ->
+                req3 = updateStatusDeployment {status: 'error', id: data.id, message: 'Cannot build or deploy',ref: branch, env:current_env}, (res2) ->
               req3.end()
               
 
@@ -132,12 +134,8 @@ updateStatus = (params, fn) ->
   return req
 
 
-addDeployment = (ref, fn) ->
-  params = 
-    ref: ref
-    env: "staging"
-
-  console.log " * deploy",(params.env+"").yellow+"(#".blue+(params.ref+"").cyan+")".blue
+addDeployment = (params, fn) ->
+  console.log " * deploy",(params.ref+"").yellow+"(#".blue+(params.env+"").cyan+")".blue
 
   req = request(
     hostname:'api.github.com'
@@ -155,7 +153,7 @@ addDeployment = (ref, fn) ->
     debug 'err', arguments
 
 updateStatusDeployment = (params, fn) ->
-  console.log " * deployed",(params.env+"").green+"(#".blue+(params.ref+"").cyan+")".blue
+  console.log " * deployed",(params.ref+"").green+"(#".blue+(params.env+"").cyan+")".blue
 
   req = request(
     hostname:'api.github.com'
