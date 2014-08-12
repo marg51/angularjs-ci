@@ -151,7 +151,7 @@ addDeployment = (params, fn) ->
     debug 'err', arguments
 
 updateStatusDeployment = (params, fn) ->
-  status = if params.state is 'success' then 'success'.green else if params.status is 'pending' then 'pending'.red else (params.state+"").magenta
+  status = if params.state is 'success' then 'success'.green else if params.state is 'pending' then 'pending'.red else (params.state+"").magenta
   console.log " * deploy","->".grey,(params.env+"").underline,status+"(#".blue+(params.ref+"").cyan+")".blue
 
   req = request(
