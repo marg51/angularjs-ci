@@ -34,16 +34,16 @@ exports.onPush = (op,ref,data) ->
 
 				# when the tests are done
 				tests.on 'close', (code) ->
-				tests = undefined
+					tests = undefined
 
-				# everything went fine
-				if code is 0
-					update = updateStatus {status: 'success', sha: data.after}
-				else
-					update = updateStatus {status: 'failure', sha: data.after, message: "tests failed"}
+					# everything went fine
+					if code is 0
+						update = updateStatus {status: 'success', sha: data.after}
+					else
+						update = updateStatus {status: 'failure', sha: data.after, message: "tests failed"}
 
-				# throw the query
-				update.end()
+					# throw the query
+					update.end()
 	)
 
 	req.end()
