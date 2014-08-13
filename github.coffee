@@ -98,11 +98,11 @@ _createGithubQuery = (path, method='GET') ->
 updateStatus = (params, fn) ->
   logger.updateStatus(params)
 
-  req = request( _createGithubQuery('/repos/'+repo+'/commits/'+params.sha+'/statuses','POST'), fn )
+  req = request( _createGithubQuery('/repos/'+config.repo+'/commits/'+params.sha+'/statuses','POST'), fn )
 
   req.write(JSON.stringify(
     "state":        params.status
-    "target_url":   host_build+"/"+params.sha.slice(0,10)+'.html'
+    "target_url":   config.host_build+"/"+params.sha.slice(0,10)+'.html'
     "description":  params.message || "no infos"
     "context":      "continuous-integration/angularjs-ci"
   ));
@@ -116,7 +116,7 @@ updateStatus = (params, fn) ->
 # @params ref: branch or sha to be deployed
 # @params env: staging|prod|whatever
 addDeployment = (params, fn) ->
-  req = request( _createGithubQuery('/repos/'+repo+'/deployments','POST'), fn )
+  req = request( _createGithubQuery('/repos/'+config.repo+'/deployments','POST'), fn )
 
   req.write(JSON.stringify(
     "ref":              params.ref
@@ -135,7 +135,7 @@ addDeployment = (params, fn) ->
 updateStatusDeployment = (params, fn) ->
   logger.updateStatusDeployment(params)
 
-  req = request( _createGithubQuery('/repos/'+repo+'/deployments/'+params.id+'/statuses', 'POST'), fn)
+  req = request( _createGithubQuery('/repos/'+config.repo+'/deployments/'+params.id+'/statuses', 'POST'), fn)
 
   req.write(JSON.stringify(
     "state":        params.state
