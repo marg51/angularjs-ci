@@ -6,7 +6,7 @@ logger = require('./logger')
 
 tests = undefined
 
-export.onPush = (op,ref,data) ->
+exports.onPush = (op,ref,data) ->
 	# test = (op,ref,data) ->
 
 	# for now, we don't run multiple process
@@ -49,7 +49,7 @@ export.onPush = (op,ref,data) ->
 	req.end()
 
 
-export.onStatus = (repo, refs, data)->
+exports.onStatus = (repo, refs, data)->
 	if data.state is "success" and ( data.branches[0].name is 'dev' or data.branches[0].name is 'master' )
 		branch = data.branches[0].name
 		current_env= 'staging'
@@ -64,7 +64,7 @@ export.onStatus = (repo, refs, data)->
 						deploy = spawn("./deployment.sh",[branch])
 						deploy.stdout.on 'data', (c) -> debug 'deployment', c.toString()
 						deploy.on 'close', (code) ->
-						 	if code is 0
+							if code is 0
 								req3 = updateStatusDeployment {state: 'success', id: data.id, message: 'App ready to use',ref: branch, env:current_env}, (res2) ->
 							else
 								req3 = updateStatusDeployment {state: 'error', id: data.id, message: 'Cannot build or deploy',ref: branch, env:current_env}, (res2) ->
