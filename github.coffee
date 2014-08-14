@@ -62,7 +62,6 @@ exports.onStatus = (repo, refs, data)->
 						data2 = JSON.parse(data2)
 
 						deploy = spawn("./deployment.sh",[branch])
-						deploy.stdout.on 'data', (c) -> debug 'deployment', c.toString()
 						deploy.on 'close', (code) ->
 							if code is 0
 								req3 = updateStatusDeployment {state: 'success', id: data.id, message: 'App ready to use',ref: branch, env:current_env}, (res2) ->
