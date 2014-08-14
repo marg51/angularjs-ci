@@ -16,7 +16,7 @@ exports.updateStatus = (params) ->
 
 
 exports.updateStatusDeployment = (params) ->
-	status = getStatusStr(params.status)
+	status = getStatusStr(params.state)
 
 	console.log " * deploy","->".grey, (params.env+"").underline, status + "(#".blue + (params.ref+"").cyan + ")".blue
 
