@@ -10,7 +10,7 @@ exports.onPush = (op,ref,data) ->
 	# test = (op,ref,data) ->
 
 	# for now, we don't run multiple process
-	if tests?
+	if typeof tests is "undefined"
 		updateStatus 
 			status: 'error'
 			sha: data.after
@@ -38,9 +38,9 @@ exports.onPush = (op,ref,data) ->
 
 					# everything went fine
 					if code is 0
-						update = updateStatus {status: 'success', sha: data.after}
+						update = updateStatus {status: 'success', sha: data.after, obj: data}
 					else
-						update = updateStatus {status: 'failure', sha: data.after, message: "tests failed"}
+						update = updateStatus {status: 'failure', sha: data.after, obj: data, message: "tests failed"}
 
 					# throw the query
 					update.end()

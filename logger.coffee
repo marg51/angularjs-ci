@@ -12,7 +12,9 @@ getStatusStr = (status) ->
 exports.updateStatus = (params) ->
 	status = getStatusStr(params.status)
 
-	console.log " * status",(status+"").green+"(#".blue+(params.sha.slice(0,10)+"").cyan+")".blue
+	sha = params.sha.slice(0,10)
+	branch = params.obj.ref.split('/').pop()
+	console.log " * status",(status+"").green+"(#{branch}#".blue+(shar+"").cyan+")".blue
 
 
 exports.updateStatusDeployment = (params) ->
