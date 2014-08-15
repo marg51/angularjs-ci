@@ -26,8 +26,11 @@ server.use restify.bodyParser()
 		
 server.get 'hipchat/message', (req, res, next) ->
 	console.log req.params
+	res.send('{"status":"ok"}')
 
 server.listen 3421
+
+
 logger.listening()
 
 
