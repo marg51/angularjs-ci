@@ -25,13 +25,13 @@ exports.notify = (message, color='red') ->
 # 	for el in hooks.items
 # 		hipchat.delete_webhook(config.hipchat.room_id,el.id, -> createWebhook()) if el.name is "cibot"
 
-# createWebhook = ->
-# 	hipchat.create_webhook config.hipchat.room_id,{
-# 		url: config.hipchat.webhook
-# 		pattern: '^!cibot'
-# 		event: "room_message"
-# 		name: 'cibot'
-# 		token: config.hipchat.token
-# 	}, (err) ->
-# 		if err
-# 			console.log err
+createWebhook = ->
+	hipchat.create_webhook config.hipchat.room_id,{
+		url: config.hipchat.webhook
+		pattern: '^!cibot'
+		event: "room_message"
+		name: 'cibot'
+		token: config.hipchat.token
+	}, (err) ->
+		if err
+			console.log err

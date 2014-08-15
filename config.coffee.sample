@@ -6,4 +6,4 @@ exports.config =
 		token: "your hipchat token"
 		room_id: "dev"
 		room_token: 'room token'
-		webhook: "http://integration.mopp.com/github/callback"
+		webhook: "http://integration.mopp.com/hipchat/message"
