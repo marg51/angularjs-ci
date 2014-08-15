@@ -1,7 +1,7 @@
 config = require('./config').config
 HC = new require('hipchatter')
 hipchat = new HC(config.hipchat.token)
-exec = require('child_node').exec
+exec = require('child_process').exec
 
 
 notify = (message, color='red') ->
