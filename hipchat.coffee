@@ -3,7 +3,7 @@ HC = new require('hipchatter')
 hipchat = new HC(config.hipchat.token)
 
 
-exports.notify = (message, color='red') ->
+notify = (message, color='red') ->
 	if color is "red"
 		notify = true
 	else 
@@ -16,15 +16,17 @@ exports.notify = (message, color='red') ->
 		notify: true
 	},(err) -> console.log err if err)
 
+exports.notify = notify
+
 options = 
 	ping: ->
-		exports.notify("<b>#{req.params.item.message.from.name}</b>: pong","gray")
+		notify("<b>#{req.params.item.message.from.name}</b>: pong","gray")
 	say: (c,data) ->
 		matches = data.matches(/say (.*) to (.*)/)
 		if matches?
-			exports.notify("<b>#{matches[2]}</b>: #{matches[1]}","gray")
+			notify("<b>#{matches[2]}</b>: #{matches[1]}","gray")
 		else 
-			exports.notify("#{c.replace(/^say /,'')}","gray")
+			notify(c.replace(/^say /,''),"gray")
 
 
 exports.onMessage = (req, res, next) ->
@@ -34,7 +36,7 @@ exports.onMessage = (req, res, next) ->
 	if matches and options[matches[1]]?
 		options[matches[1]](matches[2],matches)
 	else
-		exports.notify("Hello <b>#{req.params.item.message.from.name}</b>","gray")
+		notify("Hello <b>#{req.params.item.message.from.name}</b>","gray")
 
 	res.send({status:"ok"})
 
