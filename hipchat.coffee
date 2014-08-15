@@ -44,7 +44,7 @@ exports.onMessage = (req, res, next) ->
 
 
 parse = (message) ->
-		matches = message.match(/!cibot ([a-z]+)(.*)/)
+		matches = message.match(/!cibot ([a-z]+) ?(.*)/)
 
 		return matches
 
