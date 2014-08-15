@@ -23,6 +23,12 @@ options =
                     notify("<b>#{say[2]}</b>: #{say[1]}","gray")
             else
                     notify(c.replace(/^say /,''),"gray")
+    sha: (c) ->
+    	if !c.match(/^[a-z]+$/i)
+    		return
+    	exec "cd #{config.repo_path} && git symbolic-ref #{c.toUpperCase()}", (err, data) ->
+    		if not err
+    			notify("Last deployed commit on <b>#{c}</b>: #{data.toString()}","gray")
 
 
 exports.onMessage = (req, res, next) ->
