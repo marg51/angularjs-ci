@@ -13,11 +13,8 @@ exports.updateStatus = (params) ->
 	status = getStatusStr(params.status)
 
 	sha = params.sha.slice(0,10)
-	if params.obj? 
-		branch = params.obj.ref.split('/').pop() 
-	else 
-		branch = ""
-	console.log " * status",(status+"").green+"(#{branch}#".blue+(sha+"").cyan+")".blue
+
+	console.log " * status",(status+"").green+"(#{params.branch.split('/').pop()}#".blue+(sha+"").cyan+")".blue
 
 
 exports.updateStatusDeployment = (params) ->

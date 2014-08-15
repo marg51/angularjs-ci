@@ -26,7 +26,7 @@ exports.onPush = (op,ref,data) ->
 		status: 'pending'
 		sha: data.after
 		message: 'Wait for the tests'
-		obj: data
+		branch: ref
 	, (res) ->
 		_handleResponse res, (updateStatusData) ->
 			# result of the query
@@ -43,9 +43,9 @@ exports.onPush = (op,ref,data) ->
 
 					# everything went fine
 					if code is 0
-						update = updateStatus {status: 'success', sha: data.after, obj: data}
+						update = updateStatus {status: 'success', sha: data.after, branch: ref}
 					else
-						update = updateStatus {status: 'failure', sha: data.after, obj: data, message: "tests failed"}
+						update = updateStatus {status: 'failure', sha: data.after, branch: ref, message: "tests failed"}
 
 					# throw the query
 					update.end()
