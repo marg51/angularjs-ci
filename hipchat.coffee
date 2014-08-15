@@ -18,13 +18,13 @@ exports.notify = (message, color='red') ->
 
 options = 
 	ping: ->
-		hipchat.notify("<b>#{req.params.item.message.from.name}</b>: pong","gray")
+		exports.notify("<b>#{req.params.item.message.from.name}</b>: pong","gray")
 	say: (c,data) ->
 		matches = data.matches(/say (.*) to (.*)/)
 		if matches?
-			hipchat.notify("<b>#{matches[2]}</b>: #{matches[1]}","gray")
+			exports.notify("<b>#{matches[2]}</b>: #{matches[1]}","gray")
 		else 
-			hipchat.notify("#{c.replace(/^say /,'')}","gray")
+			exports.notify("#{c.replace(/^say /,'')}","gray")
 
 
 exports.onMessage = (req, res, next) ->
@@ -34,7 +34,7 @@ exports.onMessage = (req, res, next) ->
 	if matches and options[matches[1]]?
 		options[matches[1]](matches[2],matches)
 	else
-		hipchat.notify("Hello <b>#{req.params.item.message.from.name}</b>","gray")
+		exports.notify("Hello <b>#{req.params.item.message.from.name}</b>","gray")
 
 	res.send({status:"ok"})
 
