@@ -10,11 +10,12 @@ exports.onPush = (op,ref,data) ->
 	# test = (op,ref,data) ->
 
 	# for now, we don't run multiple process
-	if typeof tests is "undefined"
+	if typeof tests isnt "undefined"
 		updateStatus 
 			status: 'error'
 			sha: data.after
 			message: 'can\'t run tests, already a process'
+			branch: ref
 		return
 
 	# branch deleted
