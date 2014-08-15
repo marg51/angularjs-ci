@@ -22,7 +22,7 @@ options =
 	ping: ->
 		notify("<b>#{req.params.item.message.from.name}</b>: pong","gray")
 	say: (c,data) ->
-		matches = data.matches(/say (.*) to (.*)/)
+		matches = data.match(/say (.*) to (.*)/)
 		if matches?
 			notify("<b>#{matches[2]}</b>: #{matches[1]}","gray")
 		else 
@@ -32,8 +32,8 @@ options =
 exports.onMessage = (req, res, next) ->
 	console.log 'query'
 	matches = parse(req.params.item.message.message)
-	console.log 'matches',matches
-	if matches and options[matches[1]]?
+	console.log 'matches',matches,options[matches[1]]?
+	if matches and matches[1]? and options[matches[1]]?
 		options[matches[1]](matches[2],matches)
 	else
 		notify("Hello <b>#{req.params.item.message.from.name}</b>","gray")
