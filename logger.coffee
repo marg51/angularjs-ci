@@ -14,7 +14,7 @@ exports.updateStatus = (params) ->
 
 	sha = params.sha.slice(0,10)
 	branch = if params.obj? then params.obj.ref.split('/').pop() else ""
-	console.log " * status",(status+"").green+"(#{branch}#".blue+(shar+"").cyan+")".blue
+	console.log " * status",(status+"").green+"(#{branch}#".blue+(sha+"").cyan+")".blue
 
 
 exports.updateStatusDeployment = (params) ->
