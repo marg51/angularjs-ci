@@ -24,9 +24,10 @@ server.use restify.acceptParser(server.acceptable)
 server.use restify.queryParser()
 server.use restify.bodyParser()
 		
-server.get 'hipchat/message', (req, res, next) ->
+server.post 'hipchat/message', (req, res, next) ->
 	console.log req.params
-	res.send('{"status":"ok"}')
+	hipchat.notify("Hello <b>#{req.params.item.message.from}</b>")
+	res.send({status:"ok"})
 
 server.listen 3421
 
