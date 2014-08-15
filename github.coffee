@@ -17,6 +17,10 @@ exports.onPush = (op,ref,data) ->
 			message: 'can\'t run tests, already a process'
 		return
 
+	# branch deleted
+	return if data.after is "0000000000000000000000000000000000000000"
+
+
 	# we set the status as pending while we make tests
 	req = updateStatus( 
 		status: 'pending'
