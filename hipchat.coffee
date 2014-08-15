@@ -33,7 +33,7 @@ options =
 				console.log err
 			else
 				console.log data
-				notify("Last deployed commit on <b>#{c}</b>: <a href='https://github.com/#{config.repo}/commit/#{data.toString()}","gray")
+				notify("Last deployed commit on <b>#{c}</b>: <a href='https://github.com/#{config.repo}/commit/#{data.toString()}'>#{data.toString()}</a>","gray")
 
 
 exports.onMessage = (req, res, next) ->
