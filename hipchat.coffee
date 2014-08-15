@@ -28,7 +28,9 @@ options =
 
 
 exports.onMessage = (req, res, next) ->
+	console.log 'query'
 	matches = parse(req.params.item.message.message)
+	console.log 'matches',matches
 	if matches and options[matches[1]]?
 		options[matches[1]](matches[2],matches)
 	else
