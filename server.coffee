@@ -26,7 +26,7 @@ server.use restify.bodyParser()
 		
 server.post 'hipchat/message', (req, res, next) ->
 	console.log req.params, req.params.item.message.from
-	hipchat.notify("Hello <b>#{req.params.item.message.from.name}</b>","grey")
+	hipchat.notify("Hello <b>#{req.params.item.message.from.name}</b>","gray")
 	res.send({status:"ok"})
 
 server.listen 3421
