@@ -26,6 +26,7 @@ exports.onPush = (op,ref,data) ->
 		status: 'pending'
 		sha: data.after
 		message: 'Wait for the tests'
+		obj: data
 	, (res) ->
 		_handleResponse res, (updateStatusData) ->
 			# result of the query
