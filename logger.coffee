@@ -11,7 +11,6 @@ getStatusStr = (status) ->
 		 (status+"").magenta
 
 getStatus = (status) ->
-	return false
 	if status is 'success'
 		true
 	else if status is 'error'
@@ -38,6 +37,8 @@ exports.updateStatusDeployment = (params) ->
 	if getStatus(params.status) is false
 		hipchat.notify("[Error] <a href='https://github.com/#{config.repo}/commit/#{params.ref}'>#{params.ref}</a> can't be deployed to <a href='#{config.deploy_build}/#{params.ref}.html'>#{params.env}</a>")
 
+	if getStatus(params.status) is true
+		hipchat.notify("[Deploy] <a href='https://github.com/#{config.repo}/commit/#{params.ref}'>#{params.ref}</a> deployed to <a href='#{config.deploy_build}/#{params.ref}.html'>#{params.env}</a>","green")
 
 	console.log " * deploy","->".grey, (params.env+"").underline, status + "(#".blue + (params.ref+"").cyan + ")".blue
 
