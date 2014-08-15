@@ -4,48 +4,49 @@ hipchat = new HC(config.hipchat.token)
 
 
 notify = (message, color='red') ->
-    hipchat.notify(config.hipchat.room_id, {
-            message: message
-            token: config.hipchat.token
-            color: color
-            notify: true
-    },(err) -> console.log err if err)
+	hipchat.notify(config.hipchat.room_id, {
+			message: message
+			token: config.hipchat.token
+			color: color
+			notify: true
+	},(err) -> console.log err if err)
 
 exports.notify = notify
 
 options =
-    ping: (a,b,message) ->
-            notify("<b>#{message.from.name}</b>: pong","gray")
-    say: (c,data) ->
-            say = data[0].match(/say (.*) to (.*)/)
-            console.log say
-            if say?
-                    notify("<b>#{say[2]}</b>: #{say[1]}","gray")
-            else
-                    notify(c.replace(/^say /,''),"gray")
-    sha: (c) ->
-    	if !c.match(/^[a-z]+$/i)
-    		return
-    	exec "cd #{config.repo_path} && git symbolic-ref #{c.toUpperCase()}", (err, data) ->
-    		if not err
-    			notify("Last deployed commit on <b>#{c}</b>: #{data.toString()}","gray")
+	ping: (a,b,message) ->
+			notify("<b>#{message.from.name}</b>: pong","gray")
+	say: (c,data) ->
+			say = data[0].match(/say (.*) to (.*)/)
+			console.log say
+			if say?
+					notify("<b>#{say[2]}</b>: #{say[1]}","gray")
+			else
+					notify(c.replace(/^say /,''),"gray")
+	sha: (c) ->
+		if !c.match(/^[a-z]+$/i)
+			console.log c, "invalid format"
+			return
+		exec "cd #{config.repo_path} && git symbolic-ref #{c.toUpperCase()}", (err, data) ->
+			if not err
+				notify("Last deployed commit on <b>#{c}</b>: #{data.toString()}","gray")
 
 
 exports.onMessage = (req, res, next) ->
-    console.log 'query'
-    matches = parse(req.params.item.message.message)
-    if matches and matches[1]? and options[matches[1]]?
-            options[matches[1]](matches[2],matches,req.params.item.message)
-    else
-            notify("Hello <b>#{req.params.item.message.from.name}</b>","gray")
+	console.log 'query'
+	matches = parse(req.params.item.message.message)
+	if matches and matches[1]? and options[matches[1]]?
+			options[matches[1]](matches[2],matches,req.params.item.message)
+	else
+			notify("Hello <b>#{req.params.item.message.from.name}</b>","gray")
 
-    res.send({status:"ok"})
+	res.send({status:"ok"})
 
 
 parse = (message) ->
-        matches = message.match(/!cibot ([a-z]+)(.*)/)
+		matches = message.match(/!cibot ([a-z]+)(.*)/)
 
-        return matches
+		return matches
 
 
 # hipchat.webhooks config.hipchat.room_id, (err, hooks) ->
