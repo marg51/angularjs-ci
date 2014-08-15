@@ -35,6 +35,14 @@ options =
 				console.log data
 				notify("Last deployed commit on <b>#{c}</b>: <a href='https://github.com/#{config.repo}/commit/#{data.toString()}'>#{data.toString()}</a>","gray")
 
+	load: (c) ->
+		exec "uptime", (err, data) ->
+			if err
+				console.log err
+			else
+				console.log data
+				notify("#{data.toString()}","gray")
+
 
 exports.onMessage = (req, res, next) ->
 	console.log 'query'
