@@ -28,7 +28,9 @@ options =
 			console.log c, "invalid format"
 			return
 		exec "cd #{config.repo_path} && git symbolic-ref #{c.toUpperCase()}", (err, data) ->
-			if not err
+			if err
+				console.log err
+			else
 				notify("Last deployed commit on <b>#{c}</b>: #{data.toString()}","gray")
 
 
