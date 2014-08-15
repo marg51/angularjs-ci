@@ -26,7 +26,7 @@ exports.updateStatus = (params) ->
 	branch = params.branch.split('/').pop()
 
 	if getStatus(params.status) is false
-		hipchat.notify("[Error] <a href='https://github.com/#{config.repo}/commit/#{params.sha}'>#{branch}##{sha}</a> tests <a href='#{config.host_build}/#{sha}.html>failed</a>")
+		hipchat.notify("[Error] <a href='https://github.com/#{config.repo}/commit/#{params.sha}'><b>#{branch}#</b>#{sha}</a> tests <a href='#{config.host_build}/#{sha}.html'>failed</a>")
 
 
 	console.log " * status",(status+"").green+"(#{branch}#".blue+(sha+"").cyan+")".blue
@@ -36,7 +36,7 @@ exports.updateStatusDeployment = (params) ->
 	status = getStatusStr(params.state)
 
 	if getStatus(params.status) is false
-		hipchat.notify("[Error] <a href='https://github.com/#{config.repo}/commit/#{params.ref}>#{params.ref}</a> can't be deployed to <a href='#{config.deploy_build}/#{params.ref}.html>#{params.env}</a>")
+		hipchat.notify("[Error] <a href='https://github.com/#{config.repo}/commit/#{params.ref}'>#{params.ref}</a> can't be deployed to <a href='#{config.deploy_build}/#{params.ref}.html'>#{params.env}</a>")
 
 
 	console.log " * deploy","->".grey, (params.env+"").underline, status + "(#".blue + (params.ref+"").cyan + ")".blue
