@@ -31,6 +31,7 @@ options =
 			if err
 				console.log err
 			else
+				console.log data
 				notify("Last deployed commit on <b>#{c}</b>: #{data.toString()}","gray")
 
 
