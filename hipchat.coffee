@@ -44,7 +44,7 @@ options =
 				notify("#{data.toString()}","gray")
 
 	help: ->
-		Object.keys(options).join('<br />')
+		notify(Object.keys(options).join('<br />'),"gray")
 
 scope = {}
 
