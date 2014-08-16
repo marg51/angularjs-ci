@@ -16,13 +16,15 @@ notify = (message, color='red') ->
 exports.notify = notify
 
 options =
+	to: (to) ->
+		options
 	ping: ->
 			notify("<b>#{options.from.name}</b>: pong","gray")
 	
 	say: (what,to) ->
 		if to
 			what = "<b>#{to}</b>: "+what
-		notify(what, "gray")
+		notify(what+"", "gray")
 	getSha: (env) ->
 		if !env.match(/^[a-z]+$/i)
 			console.log env, "invalid format"
@@ -41,11 +43,15 @@ options =
 				console.log data
 				notify("#{data.toString()}","gray")
 
+	help: ->
+		Object.keys(options).join('<br />')
+
+scope = {}
 
 exports.onMessage = (req, res, next) ->
 	console.log 'query'
 	options.from = req.params.item.message.from
-	parser(req.params.item.message.message)({},options)
+	parser(req.params.item.message.message.replace(/^!cibot /,''))(scope,options)
 
 
 # hipchat.webhooks config.hipchat.room_id, (err, hooks) ->
