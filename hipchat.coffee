@@ -2,6 +2,7 @@ config = require('./config').config
 HC = new require('hipchatter')
 hipchat = new HC(config.hipchat.token)
 exec = require('child_process').exec
+parser = require('./parser')
 
 
 notify = (message, color='red') ->
@@ -17,6 +18,8 @@ exports.notify = notify
 options =
 	ping: (a,b,message) ->
 			notify("<b>#{message.from.name}</b>: pong","gray")
+	exec: (a,b) ->
+		parser(a)(options)
 	say: (c,data) ->
 			say = data[0].match(/say (.*) to (.*)/)
 			console.log say
