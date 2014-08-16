@@ -2,7 +2,7 @@ config = require('./config').config
 HC = new require('hipchatter')
 hipchat = new HC(config.hipchat.token)
 exec = require('child_process').exec
-parser = require('./parser')
+parser = require('./parser').parser
 
 
 notify = (message, color='red') ->
@@ -16,27 +16,22 @@ notify = (message, color='red') ->
 exports.notify = notify
 
 options =
-	ping: (a,b,message) ->
-			notify("<b>#{message.from.name}</b>: pong","gray")
-	exec: (a,b) ->
-		parser(a)(options)
-	say: (c,data) ->
-			say = data[0].match(/say (.*) to (.*)/)
-			console.log say
-			if say?
-					notify("<b>#{say[2]}</b>: #{say[1]}","gray")
-			else
-					notify(c.replace(/^say /,''),"gray")
-	sha: (c) ->
-		if !c.match(/^[a-z]+$/i)
-			console.log c, "invalid format"
-			return
-		exec "cd #{config.repo_path} && git symbolic-ref #{c.toUpperCase()}", (err, data) ->
+	ping: ->
+			notify("<b>#{options.from.name}</b>: pong","gray")
+	
+	say: (what,to) ->
+		if to
+			what = "<b>#{to}</b>: "+what
+		notify(what, "gray")
+	getSha: (env) ->
+		if !env.match(/^[a-z]+$/i)
+			console.log env, "invalid format"
+		exec "cd #{config.repo_path} && git symbolic-ref #{env.toUpperCase()}", (err, data) ->
 			if err
 				console.log err
 			else
 				console.log data
-				notify("Last deployed commit on <b>#{c}</b>: <a href='https://github.com/#{config.repo}/commit/#{data.toString()}'>#{data.toString()}</a>","gray")
+				notify("Last deployed commit on <b>#{env}</b>: <a href='https://github.com/#{config.repo}/commit/#{data.toString()}'>#{data.toString()}</a>","gray")
 
 	load: (c) ->
 		exec "uptime", (err, data) ->
@@ -49,19 +44,8 @@ options =
 
 exports.onMessage = (req, res, next) ->
 	console.log 'query'
-	matches = parse(req.params.item.message.message)
-	if matches and matches[1]? and options[matches[1]]?
-			options[matches[1]](matches[2],matches,req.params.item.message)
-	else
-			notify("Hello <b>#{req.params.item.message.from.name}</b>","gray")
-
-	res.send({status:"ok"})
-
-
-parse = (message) ->
-		matches = message.match(/!cibot ([a-z]+) ?(.*)/)
-
-		return matches
+	options.from = req.params.item.message.from
+	parser(req.params.item.message.message)({},options)
 
 
 # hipchat.webhooks config.hipchat.room_id, (err, hooks) ->
