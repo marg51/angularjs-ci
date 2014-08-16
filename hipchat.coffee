@@ -19,7 +19,7 @@ options =
 	to: (to) ->
 		options
 	ping: ->
-			notify("<b>#{options.from.name}</b>: pong","gray")
+			notify("<b>#{scope.from.name}</b>: pong","gray")
 	
 	say: (what,to) ->
 		if to
@@ -50,7 +50,7 @@ scope = {}
 
 exports.onMessage = (req, res, next) ->
 	console.log 'query'
-	options.from = req.params.item.message.from
+	scope.from = req.params.item.message.from
 	parser(req.params.item.message.message.replace(/^!cibot /,''))(scope,options)
 
 
