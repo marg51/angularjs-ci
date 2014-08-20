@@ -42,12 +42,12 @@ exports.updateStatusDeployment = (params) ->
 		hipchat.notify("[Error:#{params.obj.repo}] <a href='https://github.com/#{params.obj.repo}/commit/#{params.obj.branch}'>#{params.obj.branch}</a> can't be deployed to <a href='#{config.deploy_build}/#{params.obj.repo}/#{params.obj.branch}.html'>#{params.obj.env}</a>")
 
 	if getStatus(params.status) is true
-		hipchat.notify("[Deploy:#{params.obj.repo}] <a href='https://github.com/#{params.obj.repo}/commit/#{params.obj.branch}'>#{params.obj.branch}</a> deployed to <a href='#{config.deploy_build}/#{params.obj.repo}/#{params.obj.branch}.html'>#{params.obj.env}</a>","green")
+		hipchat.notify("[Deploy:#{params.obj.repo}] <a href='https://github.com/#{params.obj.sha}/commit/#{params.obj.branch}'>#{params.obj.branch}</a> deployed to <a href='#{config.deploy_build}/#{params.obj.repo}/#{params.obj.branch}.html'>#{params.obj.env}</a>","green")
 
-	console.log " * ", status + "(#".blue + (params.obj.branch+"").cyan + ")".blue, "->".grey, (params.obj.env+"").underline,  params.obj.repo.split('/').pop().grey
+	console.log " *", status + "(#".blue + (params.obj.branch+"").cyan + ")".blue, "->".grey, (params.obj.env+"").underline,  params.obj.repo.split('/').pop().grey
 
 	if getStatus(params.status) is false
-		console.log " * ".magenta, "#{config.deploy_build}/#{params.obj.repo}/#{sha}.html".grey
+		console.log " *".magenta, "#{config.deploy_build}/#{params.obj.repo}/#{sha}.html".grey
 
 exports.error = (err,name) ->
 	console.log "[error:#{name}] ".magenta,err
