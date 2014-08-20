@@ -16,13 +16,21 @@ normalizeData = (type, data) ->
 		repo: data.repository.full_name
 		branch: data.ref.split('/').pop() # refs/heads/dev
 		parent: data.before
-	else if type is "deploy" 
+	# /deployments/:id/
+	else if type is "deploy"
 		id: data.id
 		sha: data.deployment.sha
 		branch: data.deployment.ref
 		env: data.deployment.environment
 		repo: data.repository.full_name
 		status: data.state
+	# /deployments
+	else if type is "deployment"
+		id: data.id
+		sha: data.sha
+		branch: data.ref
+		env: data.environment
+		repo: data.name
 
 exports.normalizeData = normalizeData
 
@@ -72,34 +80,32 @@ exports.onStatus = (repo, refs, data)->
 	dataStatus = normalizeData('status',data)
 
 	if dataStatus.status is "success" and ( dataStatus.branches.indexOf('staging') > -1 or dataStatus.branches.indexOf('master') > -1 or dataStatus.branches.indexOf('dev') > -1)
+		dataStatus.env = if dataStatus.branches.indexOf('master') >- 1 then "production" else "staging"
 		req = addDeployment dataStatus, (res) ->
 			_handleResponse res, (data) ->
 				data = JSON.parse(data)
-
-				req2 = updateStatusDeployment {status: 'pending', id: data.id, ref: dataStatus.branch, env:dataStatus.env}, (res2) ->
-					_handleResponse res2, exports.onDeploy
+				dataStatus.id = data.id
+				exports.onDeploy(dataStatus)
+				req2 = updateStatusDeployment {status: 'pending', obj:dataStatus}
 				req2.end()
 
 		req.end()
 
 
 exports.onDeploy = (data) ->
-	data = JSON.parse(data)
-	dataDeploy = normalizeData('deploy', data)
-
-	deploy = spawn("#{config.path}/#{dataPush.repo}/scripts/deploy.sh",[dataDeploy.branch])
+	deploy = spawn("#{config.path}/#{data.repo}/scripts/deploy.sh",[data.branch])
 	deploy.on 'close', (code) ->
 		if code is 0
-			req = updateStatusDeployment {status: 'success', id: dataDeploy.id, message: 'App ready to use',ref: dataDeploy.branch, env:dataDeploy.en}, (res) ->
-			deployed = spawn("#{config.path}/#{dataDeploy.repo}/scripts/post-deployment.sh",[dataDeploy.branch,dataDeploy.sha])
+			req = updateStatusDeployment {status: 'success', message: 'App ready to use', obj: data}, (res) ->
+			deployed = spawn("#{config.path}/#{data.repo}/scripts/post-deployment.sh",[data.branch,data.sha])
 			tests.on 'error', (err) ->
-				logger.error err
+				logger.error err, "post-deploy"
 		else
-			req = updateStatusDeployment {status: 'error', id: dataDeploy.id, message: 'Cannot build or deploy',ref: dataDeploy.branch, env:dataDeploy.env}, (res) ->
+			req = updateStatusDeployment {status: 'error', message: 'Cannot build or deploy', obj: data}, (res) ->
 			
 		req.end()
 	deploy.on 'error', (err) ->
-		logger.error err
+		logger.error err,"deploy"
 
 _handleResponse = (res, fn) ->
 	data = ''
@@ -128,7 +134,7 @@ updateStatus = (params, fn) ->
 
   req.write(JSON.stringify(
     "state":        params.status
-    "target_url":   "#{config.host_build}/#{params.repo}/#{params.obj.sha.slice(0,10)}.html"
+    "target_url":   "#{config.host_build}/#{params.obj.repo}/#{params.obj.sha.slice(0,10)}.html"
     "description":  params.message || "no infos"
     "context":      "continuous-integration/angularjs-ci"
   ));
@@ -141,14 +147,14 @@ updateStatus = (params, fn) ->
 # params({ref,env})
 # @params ref: branch or sha to be deployed
 # @params env: staging|prod|whatever
-addDeployment = (params, fn) ->
-  req = request( _createGithubQuery("/repos/#{params.repo}/deployments",'POST'), fn )
+addDeployment = (obj, fn) ->
+  req = request( _createGithubQuery("/repos/#{obj.repo}/deployments",'POST'), fn )
 
   req.write(JSON.stringify(
-    "ref":              params.branch
+    "ref":              obj.branch
     "auto_merge":       false
-    "environment":      params.env
-    "description":      "Ready to deploy #{params.branch}"
+    "environment":      obj.env
+    "description":      "Ready to deploy #{obj.branch}"
     "required_contexts":["continuous-integration/angularjs-ci"]
   ))
 

@@ -35,15 +35,15 @@ exports.updateStatusDeployment = (params) ->
 	status = getStatusStr(params.status)
 
 	if getStatus(params.status) is false
-		hipchat.notify("[Error] <a href='https://github.com/#{params.repo}/commit/#{params.branch}'>#{params.branch}</a> can't be deployed to <a href='#{config.deploy_build}/#{params.branch}.html'>#{params.env}</a>")
+		hipchat.notify("[Error] <a href='https://github.com/#{params.obj.repo}/commit/#{params.obj.branch}'>#{params.obj.branch}</a> can't be deployed to <a href='#{config.deploy_build}/#{params.obj.branch}.html'>#{params.obj.env}</a>")
 
 	if getStatus(params.status) is true
-		hipchat.notify("[Deploy] <a href='https://github.com/#{params.repo}/commit/#{params.branch}'>#{params.branch}</a> deployed to <a href='#{config.deploy_build}/#{params.branch}.html'>#{params.env}</a>","green")
+		hipchat.notify("[Deploy] <a href='https://github.com/#{params.obj.repo}/commit/#{params.obj.branch}'>#{params.obj.branch}</a> deployed to <a href='#{config.deploy_build}/#{params.obj.branch}.html'>#{params.obj.env}</a>","green")
 
-	console.log " * deploy","->".grey, (params.env+"").underline, status + "(#".blue + (params.branch+"").cyan + ")".blue
+	console.log " * deploy","->".grey, (params.obj.env+"").underline, status + "(#".blue + (params.obj.branch+"").cyan + ")".blue
 
-exports.error = (err) ->
-	console.log "[error] ".magenta,err
+exports.error = (err,name) ->
+	console.log "[error:#{name}] ".magenta,err
 
 exports.listening = ->
 	console.log " *".green,"Listen to","3420".green
