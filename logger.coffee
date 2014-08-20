@@ -2,6 +2,10 @@ require('colors')
 config = require('./config').config
 hipchat = require('./hipchat')
 
+getDate = ->
+	x = new Date()
+	"[#{x.getHours()}:#{x.getMinutes()}:#{x.getSeconds()}]".grey
+	
 getStatusStr = (status) ->
 	if status is 'success'
 		'S'.green 
@@ -30,7 +34,7 @@ exports.updateStatus = (params) ->
 		hipchat.notify("[Error:#{params.obj.repo}] <a href='https://github.com/#{params.obj.repo}/commit/#{params.obj.sha}'><b>#{branch}#</b>#{sha}</a> tests <a href='#{config.host_build}/#{params.obj.repo}/#{sha}.html'>failed</a>")
 
 
-	console.log " *", status + "(#{branch}#".blue+(sha+"").cyan+")".blue, params.obj.repo.split('/').pop().grey
+	console.log getDate(), status + "(#{branch}#".blue+(sha+"").cyan+")".blue, params.obj.repo.split('/').pop().grey
 
 	if getStatus(params.status) is false
 		console.log " *".magenta, "#{config.host_build}/#{params.obj.repo}/#{sha}.html".grey
@@ -44,7 +48,7 @@ exports.updateStatusDeployment = (params) ->
 	if getStatus(params.status) is true
 		hipchat.notify("[Deploy:#{params.obj.repo}] <a href='https://github.com/#{params.obj.repo}/commit/#{params.obj.sha}'>#{params.obj.branch}</a> deployed to <a href='#{config.deploy_build}/#{params.obj.repo}/#{params.obj.branch}.html'>#{params.obj.env}</a>","green")
 
-	console.log " *", status + "(#{params.obj.branch}#".blue + params.obj.sha.slice(0,10).cyan + ")".blue, "->".grey, (params.obj.env+"").underline,  params.obj.repo.split('/').pop().grey
+	console.log getDate(), status + "(#{params.obj.branch}#".blue + params.obj.sha.slice(0,10).cyan + ")".blue, "->".grey, (params.obj.env+"").underline,  params.obj.repo.split('/').pop().grey
 
 	if getStatus(params.status) is false
 		console.log " *".magenta, "#{config.deploy_build}/#{params.obj.repo}/#{sha}.html".grey
@@ -54,4 +58,4 @@ exports.error = (err,name) ->
 
 exports.listening = ->
 	console.log " *".green,"Listen to","3420".green
-	console.log " *".grey,"test results ->",(config.host_build+"/*.html").cyan
+	console.log getDate(),"test results ->",(config.host_build+"/*.html").cyan
