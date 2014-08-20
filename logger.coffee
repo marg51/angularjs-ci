@@ -48,7 +48,7 @@ exports.updateStatusDeployment = (params) ->
 	if getStatus(params.status) is true
 		hipchat.notify("[Deploy:#{params.obj.repo}] <a href='https://github.com/#{params.obj.repo}/commit/#{params.obj.sha}'>#{params.obj.branch}</a> deployed to <a href='#{config.deploy_build}/#{params.obj.repo}/#{params.obj.branch}.html'>#{params.obj.env}</a>","green")
 
-	console.log getDate(), status + "(#{params.obj.branch}#".blue + params.obj.sha.slice(0,10).cyan + ")".blue, "->".grey, (params.obj.env+"").underline,  params.obj.repo.split('/').pop().grey
+	console.log getDate(), status + "(#{params.obj.branch}#".blue + params.obj.sha.slice(0,10).cyan, "->",params.obj.env.blue + ")".blue, params.obj.repo.split('/').pop().grey
 
 	if getStatus(params.status) is false
 		console.log " *".magenta, "#{config.deploy_build}/#{params.obj.repo}/#{sha}.html".grey
