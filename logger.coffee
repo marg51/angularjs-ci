@@ -5,7 +5,7 @@ hipchat = require('./hipchat')
 getDate = ->
 	x = new Date()
 	"[#{x.getHours()}:#{x.getMinutes()}:#{x.getSeconds()}]".grey
-	
+
 getStatusStr = (status) ->
 	if status is 'success'
 		'S'.green 
@@ -53,8 +53,8 @@ exports.updateStatusDeployment = (params) ->
 	if getStatus(params.status) is false
 		console.log " *".magenta, "#{config.deploy_build}/#{params.obj.repo}/#{sha}.html".grey
 
-exports.error = (err,name) ->
-	console.log "[error:#{name}] ".magenta,err
+exports.error = (err) ->
+	console.log " *".magenta, err.grey
 
 exports.listening = ->
 	console.log " *".green,"Listen to","3420".green

@@ -69,7 +69,7 @@ exports.onPush = (op,ref,data) ->
 					update.end()
 
 				tests.on 'error', (err) ->
-					logger.error err
+					logger.error "can't find #{config.path}/#{data.repo}/scripts/post-update.sh"
 	)
 
 	req.end()
@@ -99,13 +99,13 @@ exports.onDeploy = (data) ->
 			req = updateStatusDeployment {status: 'success', message: 'App ready to use', obj: data}, (res) ->
 			deployed = spawn("#{config.path}/#{data.repo}/scripts/post-deployment.sh",[data.branch,data.sha])
 			deployed.on 'error', (err) ->
-				logger.error err, "post-deploy"
+				logger.error "can't find #{config.path}/#{data.repo}/scripts/post-deploy.sh"
 		else
 			req = updateStatusDeployment {status: 'error', message: 'Cannot build or deploy', obj: data}, (res) ->
 			
 		req.end()
 	deploy.on 'error', (err) ->
-		logger.error err,"deploy"
+		logger.error "can't find #{config.path}/#{data.repo}/scripts/deploy.sh"
 
 _handleResponse = (res, fn) ->
 	data = ''
