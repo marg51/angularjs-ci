@@ -98,7 +98,7 @@ exports.onDeploy = (data) ->
 		if code is 0
 			req = updateStatusDeployment {status: 'success', message: 'App ready to use', obj: data}, (res) ->
 			deployed = spawn("#{config.path}/#{data.repo}/scripts/post-deployment.sh",[data.branch,data.sha])
-			tests.on 'error', (err) ->
+			deployed.on 'error', (err) ->
 				logger.error err, "post-deploy"
 		else
 			req = updateStatusDeployment {status: 'error', message: 'Cannot build or deploy', obj: data}, (res) ->
