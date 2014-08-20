@@ -142,13 +142,13 @@ updateStatus = (params, fn) ->
 # @params ref: branch or sha to be deployed
 # @params env: staging|prod|whatever
 addDeployment = (params, fn) ->
-  req = request( _createGithubQuery("/repos/#{params.obj.repo}/deployments",'POST'), fn )
+  req = request( _createGithubQuery("/repos/#{params.repo}/deployments",'POST'), fn )
 
   req.write(JSON.stringify(
-    "ref":              params.obj.branch
+    "ref":              params.branch
     "auto_merge":       false
-    "environment":      params.obj.env
-    "description":      "Ready to deploy #{params.obj.branch}"
+    "environment":      params.env
+    "description":      "Ready to deploy #{params.branch}"
     "required_contexts":["continuous-integration/angularjs-ci"]
   ))
 
