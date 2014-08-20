@@ -71,7 +71,7 @@ exports.onStatus = (repo, refs, data)->
 
 	dataStatus = normalizeData('status',data)
 
-	if data.state is "success" and ( dataStatus.branches.indexOf('staging') > -1 or dataStatus.branches.indexOf('master') > -1)
+	if dataStatus.status is "success" and ( dataStatus.branches.indexOf('staging') > -1 or dataStatus.branches.indexOf('master') > -1 or dataStatus.branches.indexOf('dev') > -1)
 		req = addDeployment dataStatus, (res) ->
 			_handleResponse res, (data) ->
 				data = JSON.parse(data)
@@ -87,11 +87,13 @@ exports.onDeploy = (data) ->
 	data = JSON.parse(data)
 	dataDeploy = normalizeData('deploy', data)
 
-	deploy = spawn("./scripts/deployment.sh",[dataDeploy.branch])
+	deploy = spawn("#{config.path}/#{dataPush.repo}/scripts/deploy.sh",[dataDeploy.branch])
 	deploy.on 'close', (code) ->
 		if code is 0
 			req = updateStatusDeployment {status: 'success', id: dataDeploy.id, message: 'App ready to use',ref: dataDeploy.branch, env:dataDeploy.en}, (res) ->
-			spawn("#{config.path}/#{dataDeploy.repo}/scripts/post-deployment.sh",[dataDeploy.branch,dataDeploy.sha])
+			deployed = spawn("#{config.path}/#{dataDeploy.repo}/scripts/post-deployment.sh",[dataDeploy.branch,dataDeploy.sha])
+			tests.on 'error', (err) ->
+				logger.error err
 		else
 			req = updateStatusDeployment {status: 'error', id: dataDeploy.id, message: 'Cannot build or deploy',ref: dataDeploy.branch, env:dataDeploy.env}, (res) ->
 			
