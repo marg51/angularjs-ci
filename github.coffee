@@ -80,7 +80,7 @@ exports.onStatus = (repo, refs, data)->
 	dataStatus = normalizeData('status',data)
 
 	if dataStatus.status is "success" and ( dataStatus.branches.indexOf('staging') > -1 or dataStatus.branches.indexOf('master') > -1 or dataStatus.branches.indexOf('dev') > -1)
-		dataStatus.env = if dataStatus.branches.indexOf('master') >- 1 then "production" else "staging"
+		dataStatus.env = if dataStatus.branches.indexOf('master') >- 1 then "production" else "stage"
 		req = addDeployment dataStatus, (res) ->
 			_handleResponse res, (data) ->
 				data = JSON.parse(data)
@@ -93,7 +93,7 @@ exports.onStatus = (repo, refs, data)->
 
 
 exports.onDeploy = (data) ->
-	deploy = spawn("#{config.path}/#{data.repo}/scripts/deploy.sh",[data.branch])
+	deploy = spawn("#{config.path}/#{data.repo}/scripts/deploy.sh",[data.branch, data.env])
 	deploy.on 'close', (code) ->
 		if code is 0
 			req = updateStatusDeployment {status: 'success', message: 'App ready to use', obj: data}, (res) ->

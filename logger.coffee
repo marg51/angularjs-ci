@@ -30,10 +30,10 @@ exports.updateStatus = (params) ->
 		hipchat.notify("[Error:#{params.obj.repo}] <a href='https://github.com/#{params.obj.repo}/commit/#{params.obj.sha}'><b>#{branch}#</b>#{sha}</a> tests <a href='#{config.host_build}/#{params.obj.repo}/#{sha}.html'>failed</a>")
 
 
-	console.log " * ", status + "(#{branch}#".blue+(sha+"").cyan+")".blue, params.obj.repo.split('/').pop().grey
+	console.log " *", status + "(#{branch}#".blue+(sha+"").cyan+")".blue, params.obj.repo.split('/').pop().grey
 
 	if getStatus(params.status) is false
-		console.log " * ".magenta, "#{config.host_build}/#{params.obj.repo}/#{sha}.html".grey
+		console.log " *".magenta, "#{config.host_build}/#{params.obj.repo}/#{sha}.html".grey
 
 exports.updateStatusDeployment = (params) ->
 	status = getStatusStr(params.status)
