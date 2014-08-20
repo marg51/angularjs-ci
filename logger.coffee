@@ -21,29 +21,30 @@ getStatus = (status) ->
 exports.updateStatus = (params) ->
 	status = getStatusStr(params.status)
 
-	sha = params.sha.slice(0,10)
-	branch = params.branch.split('/').pop()
+	sha = params.obj.sha.slice(0,10)
+	branch = params.obj.branch
 
 	if getStatus(params.status) is false
-		hipchat.notify("[Error] <a href='https://github.com/#{config.repo}/commit/#{params.sha}'><b>#{branch}#</b>#{sha}</a> tests <a href='#{config.host_build}/#{sha}.html'>failed</a>")
+		hipchat.notify("[Error] <a href='https://github.com/#{params.obj.repo}/commit/#{params.obj.sha}'><b>#{branch}#</b>#{sha}</a> tests <a href='#{config.host_build}/#{params.obj.repo}/#{sha}.html'>failed</a> (#{branch})")
 
 
 	console.log " * status",(status+"").green+"(#{branch}#".blue+(sha+"").cyan+")".blue
 
 
 exports.updateStatusDeployment = (params) ->
-	status = getStatusStr(params.state)
+	status = getStatusStr(params.status)
 
-	if getStatus(params.state) is false
-		hipchat.notify("[Error] <a href='https://github.com/#{config.repo}/commit/#{params.ref}'>#{params.ref}</a> can't be deployed to <a href='#{config.deploy_build}/#{params.ref}.html'>#{params.env}</a>")
+	if getStatus(params.status) is false
+		hipchat.notify("[Error] <a href='https://github.com/#{params.repo}/commit/#{params.branch}'>#{params.branch}</a> can't be deployed to <a href='#{config.deploy_build}/#{params.branch}.html'>#{params.env}</a>")
 
-	if getStatus(params.state) is true
-		hipchat.notify("[Deploy] <a href='https://github.com/#{config.repo}/commit/#{params.ref}'>#{params.ref}</a> deployed to <a href='#{config.deploy_build}/#{params.ref}.html'>#{params.env}</a>","green")
+	if getStatus(params.status) is true
+		hipchat.notify("[Deploy] <a href='https://github.com/#{params.repo}/commit/#{params.branch}'>#{params.branch}</a> deployed to <a href='#{config.deploy_build}/#{params.branch}.html'>#{params.env}</a>","green")
 
-	console.log " * deploy","->".grey, (params.env+"").underline, status + "(#".blue + (params.ref+"").cyan + ")".blue
+	console.log " * deploy","->".grey, (params.env+"").underline, status + "(#".blue + (params.branch+"").cyan + ")".blue
 
+exports.error = (err) ->
+	console.log "[error] ".magenta,err
 
 exports.listening = ->
 	console.log " *".green,"Listen to","3420".green
-	console.log " *".grey,"repo ->",config.repo.cyan
 	console.log " *".grey,"test results ->",(config.host_build+"/*.html").cyan

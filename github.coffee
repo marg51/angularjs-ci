@@ -4,7 +4,7 @@ config = require('./config').config
 logger = require('./logger')
 _ = require('lodash')
 
-exports.normalizeData = (type, data) ->
+normalizeData = (type, data) ->
 	if type is "status"
 		sha: data.sha
 		repo: data.name
@@ -24,7 +24,7 @@ exports.normalizeData = (type, data) ->
 		repo: data.repository.full_name
 		status: data.state
 
-
+exports.normalizeData = normalizeData
 
 exports.onPush = (op,ref,data) ->
 	# test = (op,ref,data) ->
@@ -32,12 +32,12 @@ exports.onPush = (op,ref,data) ->
 	# branch deleted
 	return if data.after is "0000000000000000000000000000000000000000"
 
-	pushData = normalizeData('push',data)
+	dataPush = normalizeData('push',data)
 
 	# we set the status as pending while we make tests
 	req = updateStatus( 
 		status: 'pending'
-		obj: pushData
+		obj: dataPush
 		message: 'Running tests'
 	, (res) ->
 		_handleResponse res, (updateStatusData) ->
@@ -47,18 +47,22 @@ exports.onPush = (op,ref,data) ->
 			# if there is an id, so the update is successful (I guess, actually)
 			if result.id?
 				# run anything, karma, whatever. The branch and the sha of the new commit is passed
-				tests = spawn("#{config.path}/#{dataPush.repo}/scripts/post-update.sh",[pushData.branch,pushData.sha.slice(0,10), pushData.parent])
+				tests = spawn("#{config.path}/#{dataPush.repo}/scripts/post-update.sh",[dataPush.branch,dataPush.sha.slice(0,10), dataPush.parent])
 
 				# when the script is done
 				tests.on 'close', (code) ->
 					# everything went fine
 					if code is 0
-						update = updateStatus {status: 'success', obj: pushData}
+						update = updateStatus {status: 'success', obj: dataPush}
 					else
-						update = updateStatus {status: 'failure', obj: pushData, message: "tests failed"}
+						update = updateStatus {status: 'failure', obj: dataPush, message: "tests failed"}
 
 					# throw the query
 					update.end()
+
+				tests.on 'error', (err) ->
+					logger.error err
+					update = updateStatus {status: 'failure', obj: dataPush, message: "tests failed"}
 	)
 
 	req.end()
@@ -88,7 +92,7 @@ exports.onDeploy = (data) ->
 	deploy.on 'close', (code) ->
 		if code is 0
 			req = updateStatusDeployment {status: 'success', id: dataDeploy.id, message: 'App ready to use',ref: dataDeploy.branch, env:dataDeploy.en}, (res) ->
-			spawn("#{config.path}/#{dataPush.repo}/scripts/post-deployment.sh",[dataDeploy.branch,dataDeploy.sha])
+			spawn("#{config.path}/#{dataDeploy.repo}/scripts/post-deployment.sh",[dataDeploy.branch,dataDeploy.sha])
 		else
 			req = updateStatusDeployment {status: 'error', id: dataDeploy.id, message: 'Cannot build or deploy',ref: dataDeploy.branch, env:dataDeploy.env}, (res) ->
 			
@@ -118,11 +122,11 @@ _createGithubQuery = (path, method='GET') ->
 updateStatus = (params, fn) ->
   logger.updateStatus(params)
 
-  req = request( _createGithubQuery("/repos/#{params.repo}/commits/#{params.sha}/statuses",'POST'), fn )
+  req = request( _createGithubQuery("/repos/#{params.obj.repo}/commits/#{params.obj.sha}/statuses",'POST'), fn )
 
   req.write(JSON.stringify(
     "state":        params.status
-    "target_url":   "#{config.host_build}/#{params.repo}/#{params.sha.slice(0,10)}.html"
+    "target_url":   "#{config.host_build}/#{params.repo}/#{params.obj.sha.slice(0,10)}.html"
     "description":  params.message || "no infos"
     "context":      "continuous-integration/angularjs-ci"
   ));
@@ -136,13 +140,13 @@ updateStatus = (params, fn) ->
 # @params ref: branch or sha to be deployed
 # @params env: staging|prod|whatever
 addDeployment = (params, fn) ->
-  req = request( _createGithubQuery("/repos/#{params.repo}/deployments",'POST'), fn )
+  req = request( _createGithubQuery("/repos/#{params.obj.repo}/deployments",'POST'), fn )
 
   req.write(JSON.stringify(
-    "ref":              params.branch
+    "ref":              params.obj.branch
     "auto_merge":       false
-    "environment":      params.env
-    "description":      "Ready to deploy #{params.branch}"
+    "environment":      params.obj.env
+    "description":      "Ready to deploy #{params.obj.branch}"
     "required_contexts":["continuous-integration/angularjs-ci"]
   ))
 
@@ -155,7 +159,7 @@ addDeployment = (params, fn) ->
 updateStatusDeployment = (params, fn) ->
   logger.updateStatusDeployment(params)
 
-  req = request( _createGithubQuery("/repos/#{params.repo}/deployments/#{params.id}/statuses", 'POST'), fn)
+  req = request( _createGithubQuery("/repos/#{params.obj.repo}/deployments/#{params.obj.id}/statuses", 'POST'), fn)
 
   req.write(JSON.stringify(
     "state":        params.status
