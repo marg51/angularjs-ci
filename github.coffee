@@ -144,8 +144,8 @@ updateStatus = (params, fn) ->
 
 
 # Create an empty new deployment
-# params({ref,env})
-# @params ref: branch or sha to be deployed
+# params({branch,env})
+# @params branch: branch or sha to be deployed
 # @params env: staging|prod|whatever
 addDeployment = (obj, fn) ->
   req = request( _createGithubQuery("/repos/#{obj.repo}/deployments",'POST'), fn )

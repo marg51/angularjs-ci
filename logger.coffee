@@ -4,11 +4,13 @@ hipchat = require('./hipchat')
 
 getStatusStr = (status) ->
 	if status is 'success'
-		'success'.green 
+		'S'.green 
 	else if status is 'pending'
-		 'pending'.red 
-	else 
-		 (status+"").magenta
+		'P'.red 
+	else if status is 'error' or status is 'pending'
+		'E'.magenta
+	else
+		(status+"").magenta
 
 getStatus = (status) ->
 	if status is 'success'
@@ -28,8 +30,10 @@ exports.updateStatus = (params) ->
 		hipchat.notify("[Error:#{params.obj.repo}] <a href='https://github.com/#{params.obj.repo}/commit/#{params.obj.sha}'><b>#{branch}#</b>#{sha}</a> tests <a href='#{config.host_build}/#{params.obj.repo}/#{sha}.html'>failed</a>")
 
 
-	console.log " * status:#{params.obj.repo}",(status+"").green+"(#{branch}#".blue+(sha+"").cyan+")".blue
+	console.log " * ", status + "(#{branch}#".blue+(sha+"").cyan+")".blue, params.obj.repo.split('/').pop().grey
 
+	if getStatus(params.status) is false
+		console.log " * ".magenta, "#{config.host_build}/#{params.obj.repo}/#{sha}.html".grey
 
 exports.updateStatusDeployment = (params) ->
 	status = getStatusStr(params.status)
@@ -40,7 +44,10 @@ exports.updateStatusDeployment = (params) ->
 	if getStatus(params.status) is true
 		hipchat.notify("[Deploy:#{params.obj.repo}] <a href='https://github.com/#{params.obj.repo}/commit/#{params.obj.branch}'>#{params.obj.branch}</a> deployed to <a href='#{config.deploy_build}/#{params.obj.branch}.html'>#{params.obj.env}</a>","green")
 
-	console.log " * deploy:#{params.obj.repo}","->".grey, (params.obj.env+"").underline, status + "(#".blue + (params.obj.branch+"").cyan + ")".blue
+	console.log " * ", status + "(#".blue + (params.obj.branch+"").cyan ")".blue, "->".grey, (params.obj.env+"").underline,  params.obj.repo.split('/').pop().grey
+
+	if getStatus(params.status) is false
+		console.log " * ".magenta, "#{config.deploy_build}/#{params.obj.repo}/#{sha}.html".grey
 
 exports.error = (err,name) ->
 	console.log "[error:#{name}] ".magenta,err
