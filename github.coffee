@@ -62,7 +62,6 @@ exports.onPush = (op,ref,data) ->
 
 				tests.on 'error', (err) ->
 					logger.error err
-					update = updateStatus {status: 'failure', obj: dataPush, message: "tests failed"}
 	)
 
 	req.end()
@@ -97,7 +96,8 @@ exports.onDeploy = (data) ->
 			req = updateStatusDeployment {status: 'error', id: dataDeploy.id, message: 'Cannot build or deploy',ref: dataDeploy.branch, env:dataDeploy.env}, (res) ->
 			
 		req.end()
-
+	deploy.on 'error', (err) ->
+		logger.error err
 
 _handleResponse = (res, fn) ->
 	data = ''

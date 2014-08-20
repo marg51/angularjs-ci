@@ -25,7 +25,7 @@ exports.updateStatus = (params) ->
 	branch = params.obj.branch
 
 	if getStatus(params.status) is false
-		hipchat.notify("[Error] <a href='https://github.com/#{params.obj.repo}/commit/#{params.obj.sha}'><b>#{branch}#</b>#{sha}</a> tests <a href='#{config.host_build}/#{params.obj.repo}/#{sha}.html'>failed</a> (#{branch})")
+		hipchat.notify("[Error] <a href='https://github.com/#{params.obj.repo}/commit/#{params.obj.sha}'><b>#{branch}#</b>#{sha}</a> tests <a href='#{config.host_build}/#{params.obj.repo}/#{sha}.html'>failed</a>")
 
 
 	console.log " * status",(status+"").green+"(#{branch}#".blue+(sha+"").cyan+")".blue
