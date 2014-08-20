@@ -7,7 +7,7 @@ getStatusStr = (status) ->
 		'S'.green 
 	else if status is 'pending'
 		'P'.red 
-	else if status is 'error' or status is 'pending'
+	else if status is 'error' or status is 'failure'
 		'E'.magenta
 	else
 		(status+"").magenta
@@ -44,7 +44,7 @@ exports.updateStatusDeployment = (params) ->
 	if getStatus(params.status) is true
 		hipchat.notify("[Deploy:#{params.obj.repo}] <a href='https://github.com/#{params.obj.repo}/commit/#{params.obj.sha}'>#{params.obj.branch}</a> deployed to <a href='#{config.deploy_build}/#{params.obj.repo}/#{params.obj.branch}.html'>#{params.obj.env}</a>","green")
 
-	console.log " *", status + "(#".blue + (params.obj.branch+"").cyan + ")".blue, "->".grey, (params.obj.env+"").underline,  params.obj.repo.split('/').pop().grey
+	console.log " *", status + "(#{params.obj.branch}#".blue + params.obj.sha.slice(0,10).cyan + ")".blue, "->".grey, (params.obj.env+"").underline,  params.obj.repo.split('/').pop().grey
 
 	if getStatus(params.status) is false
 		console.log " *".magenta, "#{config.deploy_build}/#{params.obj.repo}/#{sha}.html".grey
