@@ -13,7 +13,7 @@ getStatusStr = (status) ->
 getStatus = (status) ->
 	if status is 'success'
 		true
-	else if status is 'error'
+	else if status is 'error' || status is 'failure'
 		false
 	else 
 		null
