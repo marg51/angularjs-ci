@@ -76,7 +76,7 @@ exports.onStatus = (repo, refs, data)->
 			_handleResponse res, (data) ->
 				data = JSON.parse(data)
 
-				req2 = updateStatusDeployment {status: 'pending', id: data.id, ref: branch, env:current_env}, (res2) ->
+				req2 = updateStatusDeployment {status: 'pending', id: data.id, ref: dataStatus.branch, env:dataStatus.env}, (res2) ->
 					_handleResponse res2, exports.onDeploy
 				req2.end()
 
