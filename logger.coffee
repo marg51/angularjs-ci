@@ -25,22 +25,22 @@ exports.updateStatus = (params) ->
 	branch = params.obj.branch
 
 	if getStatus(params.status) is false
-		hipchat.notify("[Error] <a href='https://github.com/#{params.obj.repo}/commit/#{params.obj.sha}'><b>#{branch}#</b>#{sha}</a> tests <a href='#{config.host_build}/#{params.obj.repo}/#{sha}.html'>failed</a>")
+		hipchat.notify("[Error#{params.obj.repo}] <a href='https://github.com/#{params.obj.repo}/commit/#{params.obj.sha}'><b>#{branch}#</b>#{sha}</a> tests <a href='#{config.host_build}/#{params.obj.repo}/#{sha}.html'>failed</a>")
 
 
-	console.log " * status",(status+"").green+"(#{branch}#".blue+(sha+"").cyan+")".blue
+	console.log " * status:#{params.obj.repo}",(status+"").green+"(#{branch}#".blue+(sha+"").cyan+")".blue
 
 
 exports.updateStatusDeployment = (params) ->
 	status = getStatusStr(params.status)
 
 	if getStatus(params.status) is false
-		hipchat.notify("[Error] <a href='https://github.com/#{params.obj.repo}/commit/#{params.obj.branch}'>#{params.obj.branch}</a> can't be deployed to <a href='#{config.deploy_build}/#{params.obj.branch}.html'>#{params.obj.env}</a>")
+		hipchat.notify("[Error:#{params.obj.repo}] <a href='https://github.com/#{params.obj.repo}/commit/#{params.obj.branch}'>#{params.obj.branch}</a> can't be deployed to <a href='#{config.deploy_build}/#{params.obj.branch}.html'>#{params.obj.env}</a>")
 
 	if getStatus(params.status) is true
-		hipchat.notify("[Deploy] <a href='https://github.com/#{params.obj.repo}/commit/#{params.obj.branch}'>#{params.obj.branch}</a> deployed to <a href='#{config.deploy_build}/#{params.obj.branch}.html'>#{params.obj.env}</a>","green")
+		hipchat.notify("[Deploy:#{params.obj.repo}] <a href='https://github.com/#{params.obj.repo}/commit/#{params.obj.branch}'>#{params.obj.branch}</a> deployed to <a href='#{config.deploy_build}/#{params.obj.branch}.html'>#{params.obj.env}</a>","green")
 
-	console.log " * deploy","->".grey, (params.obj.env+"").underline, status + "(#".blue + (params.obj.branch+"").cyan + ")".blue
+	console.log " * deploy:#{params.obj.repo}","->".grey, (params.obj.env+"").underline, status + "(#".blue + (params.obj.branch+"").cyan + ")".blue
 
 exports.error = (err,name) ->
 	console.log "[error:#{name}] ".magenta,err
