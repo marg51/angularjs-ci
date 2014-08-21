@@ -51,7 +51,7 @@ exports.updateStatusDeployment = (params) ->
 	console.log getDate(), status + "(#{params.obj.branch}#".blue + params.obj.sha.slice(0,10).cyan, "->",params.obj.env.blue + ")".blue, params.obj.repo.split('/').pop().grey
 
 	if getStatus(params.status) is false
-		console.log " *".magenta, "#{config.deploy_build}/#{params.obj.repo}/#{sha}.html".grey
+		console.log " *".magenta, "#{config.deploy_build}/#{params.obj.repo}/#{params.obj.branch}.html".grey
 
 exports.error = (err) ->
 	console.log " *".magenta, err.grey
